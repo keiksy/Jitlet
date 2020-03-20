@@ -19,4 +19,12 @@ public class Commit implements Serializable {
         this.SHA1 = SHA1;
         this.author = author;
     }
+
+    @Override
+    public String toString() {
+        return "Hash: "+SHA1+"\n"+
+                "Commit time: "+timestamp.toString()+"\n"+
+                "Commit log: "+message+"\n"+
+                "Author: "+author+"\n";
+    }
 }

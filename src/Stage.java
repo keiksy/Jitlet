@@ -11,13 +11,22 @@ public class Stage {
         this.stagePath = stagePath;
     }
 
-    public void add(Path filePath) throws IOException{
-        Files.copy(filePath, stagePath.resolve(filePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+    public void add(Path filePath) {
+        try {
+            Files.copy(filePath, stagePath.resolve(filePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.err.println("Can not find file: " + filePath.getFileName() + ".");
+        }
     }
 
-    public List<Path> getStagedFiles() throws IOException{
+    public List<Path> getStagedFiles(){
         List<Path> stagedFilePaths = new ArrayList<>();
-        Files.list(stagePath).forEach(stagedFilePaths::add);
+        try {
+            Files.list(stagePath).forEach(stagedFilePaths::add);
+        } catch (IOException e) {
+            System.err.println("Can not fetch staging files");
+            System.exit(1);
+        }
         return stagedFilePaths;
     }
 }

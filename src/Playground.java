@@ -9,6 +9,13 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 
 public class Playground {
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
+        int a = 3;
+        try {
+            throw new Exception("haha");
+        } catch (Exception e) {
+            System.out.println("fucccc");
+        }
+        System.out.println(a);
     }
 }

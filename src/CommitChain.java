@@ -6,11 +6,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class CommitChain implements Serializable {
 
     LinkedList<Commit> chain = new LinkedList<>();
-    Path ccPath;
+    Commit head;
+    String ccPath;
 
     public static CommitChain deSerialFromPath(Path path) {
         CommitChain commitChain;
@@ -24,10 +26,22 @@ public class CommitChain implements Serializable {
     }
 
     public CommitChain(Path ccPath) {
-        this.ccPath = ccPath;
+        this.ccPath = ccPath.toString();
     }
 
     public void addCommit(Commit commit) {
         chain.addLast(commit);
+        head = commit;
+    }
+
+    public ListIterator<Commit> getEndIterator() {
+        ListIterator<Commit> iterator = chain.listIterator();
+        while (iterator.hasNext())
+            iterator.next();
+        return iterator;
+    }
+
+    public boolean isHead(Commit commit) {
+        return commit == head;
     }
 }

@@ -7,6 +7,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.ListIterator;
 
 public class Gitlet {
 
@@ -15,28 +16,44 @@ public class Gitlet {
     private static final String STAGE_DIR_NAME = "stage";
     private static final String COMMIT_CHAIN_SERIALIZATION_NAME = ".commitchain";
 
-    CommitChain commitChain;
+    CommitChain commitChain = CommitChain.deSerialFromPath(Paths.get(GIT_MAIN_DIR_NAME, COMMIT_CHAIN_SERIALIZATION_NAME));
     Stage stage = new Stage(Paths.get(GIT_MAIN_DIR_NAME, STAGE_DIR_NAME));
 
     public static void main(String[] args) {
         Gitlet gitapp = new Gitlet();
-        if (args.length == 0)
-            System.err.println("Please input a command!");
 
         switch (args[0]) {
-            case "init": gitapp.init(); break;
-            case "log": gitapp.log(); break;
-            case "add": gitapp.add(args[1]); break;
-            case "commit": gitapp.commit(args[1]); break;
+            case "init": gitapp.init(args); break;
+            case "log": gitapp.log(args); break;
+            case "add": gitapp.add(args); break;
+            case "commit": gitapp.commit(args, false); break;
             default: System.err.println("Please check your command!"); break;
         }
     }
 
-    private void log() {
-
+    private void checkArgsValid(String[] args, int argsLength) {
+        if (args.length != argsLength) {
+            if (args.length < argsLength)
+                System.err.println("Arguments is less than required length:" + (argsLength-1) + ", please check.");
+            else
+                System.err.println("Arguments is more than required length:" + (argsLength-1) + ", please check.");
+            System.exit(1);
+        }
     }
 
-    private void init() {
+    private void log(String[] args) {
+        checkArgsValid(args, 1);
+        ListIterator<Commit> endIterator = commitChain.getEndIterator();
+        while(endIterator.hasPrevious()) {
+            Commit curCommit = endIterator.previous();
+            if (commitChain.isHead(curCommit)) System.out.println("****HEAD****");
+            System.out.println(curCommit);
+            System.out.println();
+        }
+    }
+
+    private void init(String[] args) {
+        checkArgsValid(args, 1);
         Path p = Paths.get(GIT_MAIN_DIR_NAME);
         try {
             Files.createDirectory(p);
@@ -44,18 +61,16 @@ public class Gitlet {
             Files.createDirectory(p.resolve(STAGE_DIR_NAME));
         } catch (IOException e) {
             System.err.println("A Gitlet version-control system already exists in the current directory.");
-            return;
+            System.exit(1);
         }
-        commit("initial commit");
+        commit(new String[]{"commit", "initial commit"}, true);
     }
 
-    private void add(String filename) {
+    private void add(String[] args) {
+        checkArgsValid(args, 2);
+        String filename = args[1];
         Path filePath = Paths.get(filename);
-        try {
-            stage.add(filePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        stage.add(filePath);
     }
 
     private static String encryptString(String str)  {
@@ -64,32 +79,45 @@ public class Gitlet {
             byte[] ans = md.digest(str.getBytes());
             BigInteger bi = new BigInteger(1, ans);
             return bi.toString(16);
-        } catch (NoSuchAlgorithmException e) {
-            return "fuck you";
+        } catch (NoSuchAlgorithmException ignored) {
+            return "impossible!";
         }
     }
 
-    private void commit(String msg) {
+    private void commit(String[] args, boolean isFirstCommit) {
+        checkArgsValid(args, 2);
+        String msg = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = encryptString(commitTime.toString()+msg);
         Path destDirPath = Paths.get(GIT_MAIN_DIR_NAME, COMMIT_DIR_NAME, hash.substring(hash.length()-6));
+        List<Path> stagedFiles = stage.getStagedFiles();
+        if (!isFirstCommit && stagedFiles.size() == 0) {
+            System.err.println("No thing to commit, please check you staging area.");
+            System.exit(1);
+        }
 
         try {
             Files.createDirectory(destDirPath);
-            List<Path> stagedFiles = stage.getStagedFiles();
-            if (stagedFiles.size() == 0) {
-                System.err.println("No thing to commit, please check you staging area.");
-                return;
-            }
+        } catch (IOException e) {
+            System.err.println("Can not create a commit directory.");
+            return;
+        }
+
+        try {
             for (Path src : stagedFiles) {
                 Files.move(src, destDirPath.resolve(src.getFileName()));
             }
             commitChain.addCommit(new Commit(commitTime, msg, destDirPath.toString(), hash, System.getProperty("user.name")));
+            String p = Paths.get(GIT_MAIN_DIR_NAME, COMMIT_CHAIN_SERIALIZATION_NAME).toString();
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(Paths.get(GIT_MAIN_DIR_NAME, COMMIT_CHAIN_SERIALIZATION_NAME).toString()));
             oos.writeObject(commitChain);
             oos.close();
         } catch (IOException e) {
-            System.err.println("Commit IO Error");
+            try {
+                Files.delete(destDirPath);
+            } catch (IOException ignored) { }
+            //System.err.println("Can not create commit files.");
+            e.printStackTrace();
         }
     }
 }

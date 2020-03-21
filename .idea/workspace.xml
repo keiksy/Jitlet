@@ -2,11 +2,15 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="232c890e-b9cb-4bf7-8786-56b059766ba8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Exceptions/NoSuchBranchException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Exceptions/SameWithLastCommitException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/Utils.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Commit.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Commit.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Jitlet/CommitChain.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/CommitChain.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Gitlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Gitlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Playground.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Playground.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Stage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Stage.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Commit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Commit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CommitChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CommitChain.java" afterDir="false" />
@@ -30,7 +34,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1ZJFrOzRv5FkmO5e5iZ5SVyBTvH" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
@@ -39,18 +45,19 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
   </component>
   <component name="RunManager" selected="Application.Gitlet">
-    <configuration name="Gitlet" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="Gitlet" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Gitlet" />
       <module name="Jitlet" />
-      <option name="PROGRAM_PARAMETERS" value="log" />
+      <option name="PROGRAM_PARAMETERS" value="init" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../testgit" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Playground" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="Playground" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Playground" />
       <module name="Jitlet" />
       <option name="PROGRAM_PARAMETERS" value="init" />
@@ -63,12 +70,6 @@
       <item itemvalue="Application.Playground" />
       <item itemvalue="Application.Gitlet" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.Gitlet" />
-        <item itemvalue="Application.Playground" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />
@@ -84,61 +85,80 @@
     <servers />
   </component>
   <component name="WindowStateProjectService">
-    <state x="286" y="243" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584681804498">
+    <state x="698" y="296" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog" timestamp="1584715998412">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state x="286" y="243" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584681804498" />
-    <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1584679720042">
+    <state x="698" y="296" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584715998412" />
+    <state x="476" y="293" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584780465554">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser/0.23.1920.1000@0.23.1920.1000" timestamp="1584679720042" />
-    <state width="1878" height="202" key="GridCell.Tab.0.bottom" timestamp="1584681806702">
+    <state x="476" y="293" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584780465554" />
+    <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1584714121911">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.0.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584681806702" />
-    <state width="1878" height="202" key="GridCell.Tab.0.center" timestamp="1584681806700">
+    <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser/0.23.1920.1000@0.23.1920.1000" timestamp="1584714121911" />
+    <state width="1878" height="123" key="GridCell.Tab.0.bottom" timestamp="1584780479476">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.0.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584681806700" />
-    <state width="1878" height="202" key="GridCell.Tab.0.left" timestamp="1584681806699">
+    <state width="1878" height="123" key="GridCell.Tab.0.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584780479476" />
+    <state width="1878" height="123" key="GridCell.Tab.0.center" timestamp="1584780479475">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.0.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584681806699" />
-    <state width="1878" height="202" key="GridCell.Tab.0.right" timestamp="1584681806701">
+    <state width="1878" height="123" key="GridCell.Tab.0.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584780479475" />
+    <state width="1878" height="123" key="GridCell.Tab.0.left" timestamp="1584780479473">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.0.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584681806701" />
-    <state width="1878" height="202" key="GridCell.Tab.1.bottom" timestamp="1584676111874">
+    <state width="1878" height="123" key="GridCell.Tab.0.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584780479473" />
+    <state width="1878" height="123" key="GridCell.Tab.0.right" timestamp="1584780479476">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.1.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111874" />
-    <state width="1878" height="202" key="GridCell.Tab.1.center" timestamp="1584676111873">
+    <state width="1878" height="123" key="GridCell.Tab.0.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584780479476" />
+    <state width="1878" height="517" key="GridCell.Tab.1.bottom" timestamp="1584779526037">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.1.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111873" />
-    <state width="1878" height="202" key="GridCell.Tab.1.left" timestamp="1584676111873">
+    <state width="1878" height="517" key="GridCell.Tab.1.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526037" />
+    <state width="1878" height="517" key="GridCell.Tab.1.center" timestamp="1584779526035">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.1.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111873" />
-    <state width="1878" height="202" key="GridCell.Tab.1.right" timestamp="1584676111874">
+    <state width="1878" height="517" key="GridCell.Tab.1.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526035" />
+    <state width="1878" height="517" key="GridCell.Tab.1.left" timestamp="1584779526034">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.1.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111874" />
-    <state width="1878" height="202" key="GridCell.Tab.2.bottom" timestamp="1584676111875">
+    <state width="1878" height="517" key="GridCell.Tab.1.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526034" />
+    <state width="1878" height="517" key="GridCell.Tab.1.right" timestamp="1584779526037">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.2.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111875" />
-    <state width="1878" height="202" key="GridCell.Tab.2.center" timestamp="1584676111875">
+    <state width="1878" height="517" key="GridCell.Tab.1.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526037" />
+    <state width="1878" height="517" key="GridCell.Tab.2.bottom" timestamp="1584779526039">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.2.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111875" />
-    <state width="1878" height="202" key="GridCell.Tab.2.left" timestamp="1584676111874">
+    <state width="1878" height="517" key="GridCell.Tab.2.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526039" />
+    <state width="1878" height="517" key="GridCell.Tab.2.center" timestamp="1584779526038">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.2.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111874" />
-    <state width="1878" height="202" key="GridCell.Tab.2.right" timestamp="1584676111875">
+    <state width="1878" height="517" key="GridCell.Tab.2.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526038" />
+    <state width="1878" height="517" key="GridCell.Tab.2.left" timestamp="1584779526038">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="202" key="GridCell.Tab.2.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584676111875" />
+    <state width="1878" height="517" key="GridCell.Tab.2.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526038" />
+    <state width="1878" height="517" key="GridCell.Tab.2.right" timestamp="1584779526038">
+      <screen x="0" y="23" width="1920" height="1000" />
+    </state>
+    <state width="1878" height="517" key="GridCell.Tab.2.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584779526038" />
+    <state x="461" y="162" key="SettingsEditor" timestamp="1584763884054">
+      <screen x="0" y="23" width="1920" height="1000" />
+    </state>
+    <state x="461" y="162" key="SettingsEditor/0.23.1920.1000@0.23.1920.1000" timestamp="1584763884054" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Playground.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

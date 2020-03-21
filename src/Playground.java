@@ -7,15 +7,19 @@ import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.Iterator;
 
 public class Playground {
     public static void main(String[] args) {
+        Iterator<Path> iterator;
         int a = 3;
         try {
-            throw new Exception("haha");
-        } catch (Exception e) {
-            System.out.println("fucccc");
+            iterator =  Files.list(Paths.get("")).iterator();
+            while(iterator.hasNext()) {
+                System.out.println(iterator.next().toString());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        System.out.println(a);
     }
 }

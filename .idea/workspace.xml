@@ -11,8 +11,8 @@
       <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Utils.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Commit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Commit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CommitChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CommitChain.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Exceptions/NoSuchBranchException.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Gitlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Playground.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Playground.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Stage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils.java" afterDir="false" />
     </list>
@@ -49,7 +49,7 @@
     <configuration name="Gitlet" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Gitlet" />
       <module name="Jitlet" />
-      <option name="PROGRAM_PARAMETERS" value="status" />
+      <option name="PROGRAM_PARAMETERS" value="commit &quot;1st&quot;" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../testgit" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -65,8 +65,8 @@
       </method>
     </configuration>
     <list>
-      <item itemvalue="Application.Gitlet" />
       <item itemvalue="Application.Playground" />
+      <item itemvalue="Application.Gitlet" />
     </list>
   </component>
   <component name="SvnConfiguration">
@@ -87,65 +87,76 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="698" y="296" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584715998412" />
-    <state x="476" y="293" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584790026085">
+    <state x="476" y="293" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1584887407989">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state x="476" y="293" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584790026085" />
+    <state x="476" y="293" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584887407989" />
     <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser" timestamp="1584714121911">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser/0.23.1920.1000@0.23.1920.1000" timestamp="1584714121911" />
-    <state width="1878" height="368" key="GridCell.Tab.0.bottom" timestamp="1584877671199">
+    <state width="1878" height="311" key="GridCell.Tab.0.bottom" timestamp="1584888662607">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.0.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671199" />
-    <state width="1878" height="368" key="GridCell.Tab.0.center" timestamp="1584877671198">
+    <state width="1878" height="311" key="GridCell.Tab.0.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584888662607" />
+    <state width="1878" height="311" key="GridCell.Tab.0.center" timestamp="1584888662603">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.0.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671198" />
-    <state width="1878" height="368" key="GridCell.Tab.0.left" timestamp="1584877671197">
+    <state width="1878" height="311" key="GridCell.Tab.0.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584888662603" />
+    <state width="1878" height="311" key="GridCell.Tab.0.left" timestamp="1584888662598">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.0.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671197" />
-    <state width="1878" height="368" key="GridCell.Tab.0.right" timestamp="1584877671198">
+    <state width="1878" height="311" key="GridCell.Tab.0.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584888662598" />
+    <state width="1878" height="311" key="GridCell.Tab.0.right" timestamp="1584888662607">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.0.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671198" />
-    <state width="1878" height="368" key="GridCell.Tab.1.bottom" timestamp="1584877671201">
+    <state width="1878" height="311" key="GridCell.Tab.0.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584888662607" />
+    <state width="1878" height="311" key="GridCell.Tab.1.bottom" timestamp="1584888663259">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.1.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671201" />
-    <state width="1878" height="368" key="GridCell.Tab.1.center" timestamp="1584877671200">
+    <state width="1878" height="311" key="GridCell.Tab.1.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584888663259" />
+    <state width="1878" height="311" key="GridCell.Tab.1.center" timestamp="1584888663257">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.1.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671200" />
-    <state width="1878" height="368" key="GridCell.Tab.1.left" timestamp="1584877671199">
+    <state width="1878" height="311" key="GridCell.Tab.1.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584888663257" />
+    <state width="1878" height="311" key="GridCell.Tab.1.left" timestamp="1584888663255">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.1.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671199" />
-    <state width="1878" height="368" key="GridCell.Tab.1.right" timestamp="1584877671200">
+    <state width="1878" height="311" key="GridCell.Tab.1.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584888663255" />
+    <state width="1878" height="311" key="GridCell.Tab.1.right" timestamp="1584888663258">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.1.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671200" />
-    <state width="1878" height="368" key="GridCell.Tab.2.bottom" timestamp="1584877671202">
+    <state width="1878" height="311" key="GridCell.Tab.1.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584888663258" />
+    <state width="1878" height="311" key="GridCell.Tab.2.bottom" timestamp="1584888661986">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.2.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671202" />
-    <state width="1878" height="368" key="GridCell.Tab.2.center" timestamp="1584877671202">
+    <state width="1878" height="311" key="GridCell.Tab.2.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1584888661986" />
+    <state width="1878" height="311" key="GridCell.Tab.2.center" timestamp="1584888661985">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.2.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671202" />
-    <state width="1878" height="368" key="GridCell.Tab.2.left" timestamp="1584877671201">
+    <state width="1878" height="311" key="GridCell.Tab.2.center/0.23.1920.1000@0.23.1920.1000" timestamp="1584888661985" />
+    <state width="1878" height="311" key="GridCell.Tab.2.left" timestamp="1584888661984">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.2.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671201" />
-    <state width="1878" height="368" key="GridCell.Tab.2.right" timestamp="1584877671202">
+    <state width="1878" height="311" key="GridCell.Tab.2.left/0.23.1920.1000@0.23.1920.1000" timestamp="1584888661984" />
+    <state width="1878" height="311" key="GridCell.Tab.2.right" timestamp="1584888661985">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
-    <state width="1878" height="368" key="GridCell.Tab.2.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584877671202" />
+    <state width="1878" height="311" key="GridCell.Tab.2.right/0.23.1920.1000@0.23.1920.1000" timestamp="1584888661985" />
     <state x="461" y="162" key="SettingsEditor" timestamp="1584763884054">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="461" y="162" key="SettingsEditor/0.23.1920.1000@0.23.1920.1000" timestamp="1584763884054" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Gitlet.java</url>
+          <line>49</line>
+          <option name="timeStamp" value="9" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

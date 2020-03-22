@@ -2,10 +2,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -32,6 +29,8 @@ public class Utils {
     public static Path getCommitChainPath() {
         return getGitDirPath().resolve(COMMIT_CHAIN_SERIALIZATION_NAME);
     }
+
+    public static String fromHash2DirName(String hash) { return hash.substring(hash.length()-6); }
 
     public static void checkArgsValid(String[] args, int argsLength) {
         if (args.length != argsLength) {
@@ -76,7 +75,7 @@ public class Utils {
         }
     }
 
-    public static boolean isSameFiles(Path a, Path b) {
+    public static boolean isSameFiles(Path a, Path b) throws NoSuchFileException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
             byte[] abytes = md.digest(Files.readAllBytes(a));
@@ -85,7 +84,7 @@ public class Utils {
             String bmd5 = new BigInteger(1, bbytes).toString(16);
             return amd5.equals(bmd5);
         } catch (IOException | NoSuchAlgorithmException e) {
-            return true;
+            throw new NoSuchFileException("No such file");
         }
     }
 
@@ -104,6 +103,7 @@ public class Utils {
             Files.createDirectory(path);
         } catch (FileAlreadyExistsException e) {
             System.err.println("A Gitlet version-control system already exists in the current directory.");
+            System.exit(1);
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

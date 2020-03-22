@@ -6,10 +6,11 @@ import java.util.List;
 public class Stage {
 
     private Path stagePath;
-    private int fileNumbers = 0;
+    private int fileNumbers;
 
     public Stage(Path stagePath) {
         this.stagePath = stagePath;
+        fileNumbers = getStagedFiles().size();
     }
 
     public void addFile(Path filePath) {

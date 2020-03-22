@@ -6,7 +6,7 @@ import java.util.List;
 public class Commit implements Serializable {
 
     private String parent;
-    private List<Commit> branches;
+    private List<String> sons;
 
     private ZonedDateTime timestamp;
     private String log;
@@ -23,7 +23,7 @@ public class Commit implements Serializable {
         this.author = author;
 
         this.parent = parent;
-        branches = new LinkedList<>();
+        sons = new LinkedList<>();
     }
 
     public String getCommitDir() {
@@ -38,20 +38,17 @@ public class Commit implements Serializable {
         return SHA1;
     }
 
-    public String getBranchName() {
-        return branchName;
-    }
+    public String getParentStr() { return parent; }
 
-    public Commit getParent() { return parent; }
+    public String getCommitStr() { return Utils.fromHash2DirName(SHA1); }
 
-    public void addCommit(Commit commit) {
-        branches.add(commit);
+    public void addCommit(String commitStr) {
+        sons.add(commitStr);
     }
 
     @Override
     public String toString() {
         return "Hash: "+SHA1+"\n"+
-                "Branch: " + branchName+"\n"+
                 "Commit time: "+timestamp.toString()+"\n"+
                 "Commit log: "+log+"\n"+
                 "Author: "+author;
@@ -64,7 +61,6 @@ public class Commit implements Serializable {
 
         Commit commit = (Commit) o;
 
-        if (branchName != null ? !branchName.equals(commit.branchName) : commit.branchName != null) return false;
         if (timestamp != null ? !timestamp.equals(commit.timestamp) : commit.timestamp != null) return false;
         if (log != null ? !log.equals(commit.log) : commit.log != null) return false;
         if (SHA1 != null ? !SHA1.equals(commit.SHA1) : commit.SHA1 != null) return false;

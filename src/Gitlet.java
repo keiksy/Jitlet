@@ -34,7 +34,7 @@ public class Gitlet {
     private void branch(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        commitChain.newBranch(args[1]);
+        commitChain.updateBranches(args[1]);
         Utils.serializeCommitChain(commitChain);
     }
 
@@ -53,28 +53,37 @@ public class Gitlet {
         String log = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = Utils.encrypt2SHA1(commitTime.toString());
-        Path destDirPath = Utils.getCommitPath().resolve(hash.substring(hash.length()-6));
-        if (!isFirstCommit && stage.getNumberOfStagedFile()==0) {
-            System.err.println("No thing to commit, please check you staging area.");
-            return;
-        }
-        //比较上次commit中文件的md5和这次是否一样，如果一样的话，停止commit
-        List<Path> stagedFiles = stage.getStagedFiles();
-        boolean isDiff = false;
-        for (Path src : stagedFiles) {
-            Path temp = Paths.get(commitChain.getHeadCommit().getCommitDir(), src.getFileName().toString());
-            if (!Utils.isSameFiles(src, temp)) {
-                isDiff = true;
-                break;
+        //util可以做一个根据hash得文件夹名的函数，统一从那里调，保证一致性。
+        Path destDirPath = Utils.getCommitPath().resolve(Utils.fromHash2DirName(hash));
+        if (!isFirstCommit) {
+            if (stage.getNumberOfStagedFile() == 0) {
+                System.err.println("No thing to commit, please check you staging area.");
+                return;
+            }
+            //比较上次commit中文件的md5和这次是否一样，如果一样的话，停止commit
+            List<Path> stagedFiles = stage.getStagedFiles();
+            boolean isDiff = false;
+            for (Path src : stagedFiles) {
+                //绕过commit相关类直接提取上次commit中文件
+                Path temp = Paths.get(commitChain.getHeadCommit().getCommitDir(), src.getFileName().toString());
+                try {
+                    if (!Utils.isSameFiles(src, temp)) {
+                        isDiff = true;
+                        break;
+                    }
+                } catch (IOException e) {
+                    isDiff = true;
+                    break;
+                }
+            }
+            if (!isDiff) {
+                System.err.println("There is no difference between head commit and staging files.");
+                System.err.println("Any changes won't be made.");
+                return;
             }
         }
-        if (!isFirstCommit && !isDiff) {
-            System.err.println("There is no difference between head commit and staging files.");
-            System.err.println("Any changes won't be made.");
-            return;
-        }
         Utils.createDir(destDirPath);
-        stage.moveStagedFileTo(destDirPath);
+        if (!isFirstCommit) stage.moveStagedFileTo(destDirPath);
         commitChain.newCommit(commitTime, log, destDirPath.toString(), hash, System.getProperty("user.name"));
         Utils.serializeCommitChain(commitChain);
     }
@@ -84,9 +93,7 @@ public class Gitlet {
         Utils.createDir(Utils.getGitDirPath());
         Utils.createDir(Utils.getCommitPath());
         Utils.createDir(Utils.getStagePath());
-        commitChain.newBranch("master");
         commit(new String[]{"commit", "initial commit"}, true);
-        commitChain.changeBranchTo("master");
     }
 
     private void log(String[] args) {
@@ -115,7 +122,6 @@ public class Gitlet {
     private void status(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
-        System.out.println("on branch " + commitChain.getHeadCommit().getBranchName() + "\n");
         List<Path> stageFiles = stage.getStagedFiles();
         List<Path> untrackFiles = new ArrayList<>();
         List<Path> modifiedFiles = new ArrayList<>();
@@ -123,10 +129,15 @@ public class Gitlet {
         while(i.hasNext()) {
             Path p = i.next();
             Path temp = p.getFileName();
-            if (!Utils.isSameFiles(temp, p)) {
-                modifiedFiles.add(temp);
-                i.remove();
+            try {
+                if (!Utils.isSameFiles(temp, p)) {
+                    modifiedFiles.add(temp);
+                    i.remove();
+                }
+            } catch (NoSuchFileException e) {
+                continue;
             }
+
         }
         try {
             i = Files.list(Paths.get("")).filter((p) -> (!p.startsWith("."))).iterator();

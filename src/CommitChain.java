@@ -12,10 +12,11 @@ import java.util.Map;
 public class CommitChain implements Serializable , Iterable<Commit>{
 
     //branchHeads保存每一个branch指向Commit对象的引用
-    private HashMap<String, Commit> commits = new HashMap<>();
+    private HashMap<String, Commit> commits;
+    private HashMap<String, String> branches;
     private Commit chain;
     private Commit head;
-    private String curBranch;
+    private String curBranchName;
     private String ccPath;
 
     public static CommitChain deSerialFromPath(Path path) {
@@ -31,45 +32,49 @@ public class CommitChain implements Serializable , Iterable<Commit>{
 
     private CommitChain(Path ccPath) {
         this.ccPath = ccPath.toString();
+        commits = new HashMap<>();
+        branches = new HashMap<>();
     }
 
     public Commit newCommit(ZonedDateTime timestamp, String log, String commitDir,
                           String SHA1, String author) {
-        //进一步优化重复代码
         Commit commit;
         if (chain == null) {
-            commit = new Commit(timestamp, log, commitDir, SHA1, author, null);
+            commit = new Commit(timestamp, log, commitDir, SHA1, author, "null");
             chain = commit;
+            curBranchName = "master";
         } else {
-            commit = new Commit(timestamp, log, commitDir, SHA1, author, head);
-            head.addCommit(commit);
+            commit = new Commit(timestamp, log, commitDir, SHA1, author, head.getCommitStr());
+            head.addCommit(commit.getCommitStr());
         }
+        commits.put(commit.getCommitStr(), commit);
         head = commit;
-        branchHeads.put(curBranch, head);
+        //调用update
+        branches.put(curBranchName, head.getCommitStr());
         return commit;
     }
 
-    public Commit newBranch(String branchName) {
-        branchHeads.put(branchName, head);
+    public Commit updateBranches(String branchName) {
+        branches.put(branchName, head.getCommitStr());
         return head;
     }
 
     public void changeBranchTo(String branchName) {
-        Commit temp = branchHeads.get(branchName);
+        Commit temp = getCommitByStr(branches.get(branchName));
         if (temp == null) {
             System.err.println("No branch named " + branchName);
             System.exit(0);
         }
         head = temp;
-        curBranch = branchName;
-    }
-
-    public Iterator<Map.Entry<String, Commit>> getBranchMapIterator() {
-        return branchHeads.entrySet().iterator();
+        curBranchName = branchName;
     }
 
     public Commit getHeadCommit() {
         return head;
+    }
+
+    public Commit getCommitByStr(String commitStr) {
+        return commits.get(commitStr);
     }
 
     public boolean isHead(Commit commit) {
@@ -90,13 +95,13 @@ public class CommitChain implements Serializable , Iterable<Commit>{
 
         @Override
         public boolean hasNext() {
-            return cur.getParent() != null;
+            return !cur.getParentStr().equals("null");
         }
 
         @Override
         public Commit next() {
             Commit dummyCur = cur;
-            cur = dummyCur.getParent();
+            cur = getCommitByStr(dummyCur.getParentStr());
             return dummyCur;
         }
     }

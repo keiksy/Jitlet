@@ -1,5 +1,3 @@
-import Exceptions.NoSuchBranchException;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -13,10 +11,11 @@ import java.util.Map;
 
 public class CommitChain implements Serializable , Iterable<Commit>{
 
-    //branchHeads保存每一个branch开头Commit对象的引用
-    private HashMap<String, Commit> branchHeads = new HashMap<>();
-    private Commit chain = new Commit(ZonedDateTime.now(), "dummy", null, null, null, null);
-    private Commit head = chain;
+    //branchHeads保存每一个branch指向Commit对象的引用
+    private HashMap<String, Commit> commits = new HashMap<>();
+    private Commit chain;
+    private Commit head;
+    private String curBranch;
     private String ccPath;
 
     public static CommitChain deSerialFromPath(Path path) {
@@ -30,29 +29,39 @@ public class CommitChain implements Serializable , Iterable<Commit>{
         return commitChain;
     }
 
-    public CommitChain(Path ccPath) {
+    private CommitChain(Path ccPath) {
         this.ccPath = ccPath.toString();
     }
 
     public Commit newCommit(ZonedDateTime timestamp, String log, String commitDir,
                           String SHA1, String author) {
-        Commit commit = new Commit(timestamp, log, commitDir, SHA1, author, head);
-        head.addCommit(commit);
+        //进一步优化重复代码
+        Commit commit;
+        if (chain == null) {
+            commit = new Commit(timestamp, log, commitDir, SHA1, author, null);
+            chain = commit;
+        } else {
+            commit = new Commit(timestamp, log, commitDir, SHA1, author, head);
+            head.addCommit(commit);
+        }
         head = commit;
+        branchHeads.put(curBranch, head);
         return commit;
     }
 
-    public Commit newBranch(ZonedDateTime timestamp, String author, String branchName) {
-        Commit branch = new Commit(timestamp, branchName, author, head);
-        head.addBranch(branch);
-        branchHeads.put(branchName, branch);
-        return branch;
+    public Commit newBranch(String branchName) {
+        branchHeads.put(branchName, head);
+        return head;
     }
 
-    public void changeHead(String branchName) throws NoSuchBranchException {
+    public void changeBranchTo(String branchName) {
         Commit temp = branchHeads.get(branchName);
-        if (temp == null) throw new NoSuchBranchException();
+        if (temp == null) {
+            System.err.println("No branch named " + branchName);
+            System.exit(0);
+        }
         head = temp;
+        curBranch = branchName;
     }
 
     public Iterator<Map.Entry<String, Commit>> getBranchMapIterator() {

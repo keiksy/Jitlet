@@ -1,13 +1,5 @@
-import Exceptions.NoSuchBranchException;
-
 import java.io.*;
-import java.math.BigInteger;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.nio.file.*;
 import java.time.ZonedDateTime;
 import java.util.*;
 
@@ -42,35 +34,32 @@ public class Gitlet {
     private void branch(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        commitChain.newBranch(ZonedDateTime.now(), System.getProperty("user.name"), args[1]);
+        commitChain.newBranch(args[1]);
         Utils.serializeCommitChain(commitChain);
     }
 
     private void checkout(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        try {
-            commitChain.changeHead(args[1]);
-        } catch (NoSuchBranchException e) {
-            System.err.println("No branch named " + args[1] +".");
-            return;
-        }
+        commitChain.changeBranchTo(args[1]);
         Utils.serializeCommitChain(commitChain);
     }
 
+    //todo:commit的逻辑交给cc去做，这里只负责整体文件读写和控制台输出。
     private void commit(String[] args, boolean isFirstCommit) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
+        //commit必要信息
         String log = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = Utils.encrypt2SHA1(commitTime.toString());
         Path destDirPath = Utils.getCommitPath().resolve(hash.substring(hash.length()-6));
-        List<Path> stagedFiles = stage.getStagedFiles();
-        if (!isFirstCommit && stagedFiles.size() == 0) {
+        if (!isFirstCommit && stage.getNumberOfStagedFile()==0) {
             System.err.println("No thing to commit, please check you staging area.");
             return;
         }
         //比较上次commit中文件的md5和这次是否一样，如果一样的话，停止commit
+        List<Path> stagedFiles = stage.getStagedFiles();
         boolean isDiff = false;
         for (Path src : stagedFiles) {
             Path temp = Paths.get(commitChain.getHeadCommit().getCommitDir(), src.getFileName().toString());
@@ -92,26 +81,21 @@ public class Gitlet {
 
     private void init(String[] args) {
         Utils.checkArgsValid(args, 1);
-        try {
-            Files.createDirectory(Utils.getGitDirPath());
-            Files.createDirectory(Utils.getCommitPath());
-            Files.createDirectory(Utils.getStagePath());
-        } catch (FileAlreadyExistsException e) {
-            System.err.println("A Gitlet version-control system already exists in the current directory.");
-            return;
-        } catch (IOException e) {
-            System.err.println("IO Error when init");
-        }
-        branch(new String[]{"branch", "master"});
+        Utils.createDir(Utils.getGitDirPath());
+        Utils.createDir(Utils.getCommitPath());
+        Utils.createDir(Utils.getStagePath());
+        commitChain.newBranch("master");
+        commit(new String[]{"commit", "initial commit"}, true);
+        commitChain.changeBranchTo("master");
     }
 
     private void log(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
         Iterator<Commit> endIterator = commitChain.iterator();
+        //DFS正向打印
         while(endIterator.hasNext()) {
             Commit curCommit = endIterator.next();
-            if (curCommit.isBranchHead()) continue;
             if (commitChain.isHead(curCommit)) System.out.println("****HEAD****");
             System.out.println(curCommit);
             System.out.println("---------------------------------------------");
@@ -121,17 +105,13 @@ public class Gitlet {
     private void rm(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        boolean inStaging = Files.exists(Utils.getStagePath().resolve(args[1]));
-        if (inStaging) {
-            try {
-                Files.delete(Utils.getStagePath().resolve(args[1]));
-                Files.delete(Paths.get(args[1]));
-            } catch (IOException ignored) { }
-        } else {
-            System.err.println("There isn't any file named " + args[1] + ", please check your spelling.");
-        }
+        stage.removeFile(args[1]);
+        try {
+            Files.delete(Paths.get(args[1]));
+        } catch (IOException ignored) { }
     }
 
+    //TODO: refactor 去除隐藏文件夹的显示
     private void status(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
@@ -143,8 +123,7 @@ public class Gitlet {
         while(i.hasNext()) {
             Path p = i.next();
             Path temp = p.getFileName();
-            if (!Files.exists(temp)) continue;
-            if (!Utils.encrypt2MD5(temp).equals(Utils.encrypt2MD5(p))) {
+            if (!Utils.isSameFiles(temp, p)) {
                 modifiedFiles.add(temp);
                 i.remove();
             }

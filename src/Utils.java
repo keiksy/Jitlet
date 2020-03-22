@@ -2,6 +2,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.math.BigInteger;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 
 public class Utils {
 
+    //地址解耦，只在初始化git时用于指定文件夹位置，其余放到各自的类里并对外提供获取地址接口
     private static final String GIT_MAIN_DIR_NAME = ".gitlet";
     private static final String COMMIT_DIR_NAME = "commit";
     private static final String STAGE_DIR_NAME = "stage";
@@ -83,7 +85,7 @@ public class Utils {
             String bmd5 = new BigInteger(1, bbytes).toString(16);
             return amd5.equals(bmd5);
         } catch (IOException | NoSuchAlgorithmException e) {
-            return false;
+            return true;
         }
     }
 
@@ -100,9 +102,12 @@ public class Utils {
     public static void createDir(Path path) {
         try {
             Files.createDirectory(path);
+        } catch (FileAlreadyExistsException e) {
+            System.err.println("A Gitlet version-control system already exists in the current directory.");
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);
         }
     }
+
 }

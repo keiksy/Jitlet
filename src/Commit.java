@@ -1,18 +1,12 @@
 import java.io.Serializable;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class Commit implements Serializable {
 
-    private Commit parent;
+    private String parent;
     private List<Commit> branches;
-    private String branchName;
-    private boolean isBranchHead;
 
     private ZonedDateTime timestamp;
     private String log;
@@ -20,25 +14,14 @@ public class Commit implements Serializable {
     private String SHA1;
     private String author;
 
-    public Commit(ZonedDateTime timestamp, String branchName, String author, Commit parent) {
-        this.timestamp = timestamp;
-        this.branchName = branchName;
-        this.author = author;
-
-        this.parent = parent;
-        branches = new LinkedList<>();
-        isBranchHead = true;
-    }
-
     public Commit(ZonedDateTime timestamp, String log, String commitDir,
-                    String SHA1, String author, Commit parent) {
+                    String SHA1, String author, String parent) {
         this.timestamp = timestamp;
         this.log = log;
         this.commitDir = commitDir;
         this.SHA1 = SHA1;
         this.author = author;
 
-        this.branchName = parent==null ? "master" : parent.getBranchName();
         this.parent = parent;
         branches = new LinkedList<>();
     }
@@ -63,14 +46,6 @@ public class Commit implements Serializable {
 
     public void addCommit(Commit commit) {
         branches.add(commit);
-    }
-
-    public void addBranch(Commit branch) {
-        addCommit(branch);
-    }
-
-    public boolean isBranchHead() {
-        return isBranchHead;
     }
 
     @Override

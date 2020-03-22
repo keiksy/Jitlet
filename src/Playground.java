@@ -11,15 +11,6 @@ import java.util.Iterator;
 
 public class Playground {
     public static void main(String[] args) {
-        Iterator<Path> iterator;
-        int a = 3;
-        try {
-            iterator =  Files.list(Paths.get("")).iterator();
-            while(iterator.hasNext()) {
-                System.out.println(iterator.next().toString());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 }

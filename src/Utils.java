@@ -5,17 +5,18 @@ import java.math.BigInteger;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Utils {
 
-    //地址解耦，只在初始化git时用于指定文件夹位置，其余放到各自的类里并对外提供获取地址接口
-    private static final String GIT_MAIN_DIR_NAME = ".gitlet";
-    private static final String COMMIT_DIR_NAME = "commit";
-    private static final String STAGE_DIR_NAME = "stage";
-    private static final String COMMIT_CHAIN_SERIALIZATION_NAME = ".commitchain";
+    public static final String GIT_DIR_NAME = ".gitlet";
+    public static final String COMMIT_DIR_NAME = "commit";
+    public static final String STAGE_DIR_NAME = "stage";
+    public static final String COMMIT_CHAIN_SERIALIZATION_NAME = ".commitchain";
 
     public static Path getGitDirPath() {
-        return Paths.get(GIT_MAIN_DIR_NAME);
+        return Paths.get(GIT_DIR_NAME);
     }
 
     public static Path getCommitPath() {
@@ -35,17 +36,17 @@ public class Utils {
     public static void checkArgsValid(String[] args, int argsLength) {
         if (args.length != argsLength) {
             if (args.length < argsLength)
-                System.err.println("Arguments is less than required length:" + (argsLength-1) + ", please check.");
+                System.err.println("Arguments is less than required length: " + (argsLength-1) + ".");
             else
-                System.err.println("Arguments is more than required length:" + (argsLength-1) + ", please check.");
+                System.err.println("Arguments is more than required length: " + (argsLength-1) + ".");
             System.exit(0);
         }
     }
 
     public static void checkInitialized() {
-        if (!(Files.exists(Paths.get(GIT_MAIN_DIR_NAME)) &&
-                Files.exists(Paths.get(GIT_MAIN_DIR_NAME, COMMIT_DIR_NAME)) &&
-                Files.exists(Paths.get(GIT_MAIN_DIR_NAME, STAGE_DIR_NAME)))) {
+        if (!(Files.exists(getGitDirPath()) &&
+                Files.exists(getCommitPath()) &&
+                Files.exists(getStagePath()))) {
             System.err.println("Please init a Gitlet repo first.");
             System.exit(0);
         }
@@ -58,19 +59,6 @@ public class Utils {
             BigInteger bi = new BigInteger(1, ans);
             return bi.toString(16);
         } catch (NoSuchAlgorithmException ignored) {
-            return "impossible!";
-        }
-    }
-
-    public static String encrypt2MD5(Path file) {
-        try {
-            byte[] ans = MessageDigest.getInstance("MD5").digest(Files.readAllBytes(file));
-            BigInteger bi = new BigInteger(1, ans);
-            return bi.toString(16);
-        } catch (NoSuchAlgorithmException ignored) {
-            return "impossible!";
-        } catch (IOException e) {
-            e.printStackTrace();
             return "impossible!";
         }
     }
@@ -90,7 +78,7 @@ public class Utils {
 
     public static void serializeCommitChain(CommitChain cc) {
         try {
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(Paths.get(GIT_MAIN_DIR_NAME, COMMIT_CHAIN_SERIALIZATION_NAME).toString()));
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getCommitChainPath().toString()));
             oos.writeObject(cc);
             oos.close();
         } catch (IOException e) {
@@ -103,11 +91,23 @@ public class Utils {
             Files.createDirectory(path);
         } catch (FileAlreadyExistsException e) {
             System.err.println("A Gitlet version-control system already exists in the current directory.");
-            System.exit(1);
+            System.exit(0);
         } catch (IOException e) {
             e.printStackTrace();
-            System.exit(1);
+            System.exit(0);
         }
     }
 
+    public static void copyAndReplace(Path from, Path to) {
+        List<Path> srcFiles = new ArrayList<>();
+        try {
+            Files.list(from).filter((p) -> (!p.getFileName().startsWith("."))).forEach(srcFiles::add);
+            for (Path src : srcFiles) {
+                Files.copy(src, to.resolve(src.getFileName()), StandardCopyOption.REPLACE_EXISTING);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+    }
 }

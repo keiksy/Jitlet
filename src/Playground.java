@@ -8,9 +8,12 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 public class Playground {
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws Exception{
+        int a = 4;
+        if (a == 4)throw new Exception();
+        System.out.println("dd");
     }
 }

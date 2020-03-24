@@ -1,7 +1,16 @@
+import Exceptions.*;
+
 import java.io.*;
 import java.nio.file.*;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Stream;
+
+/**
+ * gitlet类负责初始化环境，IO和错误输出相关工作
+ * Utils类封装一些常用操作和辅助函数
+ * 具体业务逻辑交给commitchain类和stage类去执行
+ */
 
 public class Gitlet {
 
@@ -16,44 +25,60 @@ public class Gitlet {
             case "branch": gitapp.branch(args); break;
             case "checkout": gitapp.checkout(args); break;
             case "commit": gitapp.commit(args, false); break;
+            case "find": gitapp.find(args); break;
+            case "global-log": gitapp.globalLog(args); break;
             case "init": gitapp.init(args); break;
             case "log": gitapp.log(args); break;
+            case "merge": gitapp.merge(args); break;
+            case "reset": gitapp.reset(args); break;
             case "rm": gitapp.rm(args); break;
-            //case "find": gitapp.find(args); break;
+            case "rm-branch": gitapp.rmBranch(args); break;
             case "status": gitapp.status(args);break;
-            default: System.err.println("Please check your command!"); break;
+            default: System.err.println("Unknown command."); break;
         }
     }
 
     private void add(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        stage.addFile(Paths.get(args[1]));
+        try {
+            stage.addFile(Paths.get(args[1]));
+        } catch (NoSuchFileException e) {
+            System.err.println("No such file with name: " + args[1] + ".");
+        }
     }
 
     private void branch(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        commitChain.updateBranches(args[1]);
+        try {
+            commitChain.addBranch(args[1]);
+        } catch (AlreadyExistBranchException e) {
+            System.err.println("Can't add the branch because it exsits.");
+            return;
+        }
         Utils.serializeCommitChain(commitChain);
     }
 
     private void checkout(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        commitChain.changeBranchTo(args[1]);
+        try {
+            commitChain.changeBranchTo(args[1]);
+        } catch (NoSuchBranchException e) {
+            System.err.println("No such branch named " + args[1]);
+            return;
+        }
+        Utils.copyAndReplace(Paths.get(commitChain.getHeadCommit().getCommitDir()), Paths.get(""));
         Utils.serializeCommitChain(commitChain);
     }
 
-    //todo:commit的逻辑交给cc去做，这里只负责整体文件读写和控制台输出。
     private void commit(String[] args, boolean isFirstCommit) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        //commit必要信息
         String log = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = Utils.encrypt2SHA1(commitTime.toString());
-        //util可以做一个根据hash得文件夹名的函数，统一从那里调，保证一致性。
         Path destDirPath = Utils.getCommitPath().resolve(Utils.fromHash2DirName(hash));
         if (!isFirstCommit) {
             if (stage.getNumberOfStagedFile() == 0) {
@@ -64,7 +89,6 @@ public class Gitlet {
             List<Path> stagedFiles = stage.getStagedFiles();
             boolean isDiff = false;
             for (Path src : stagedFiles) {
-                //绕过commit相关类直接提取上次commit中文件
                 Path temp = Paths.get(commitChain.getHeadCommit().getCommitDir(), src.getFileName().toString());
                 try {
                     if (!Utils.isSameFiles(src, temp)) {
@@ -88,11 +112,23 @@ public class Gitlet {
         Utils.serializeCommitChain(commitChain);
     }
 
+    private void globalLog(String[] args) {
+        Utils.checkInitialized();
+        Utils.checkArgsValid(args, 1);
+        Iterator<Map.Entry<String, Commit>> commitIterator = commitChain.getAllCommitsIterator();
+        while(commitIterator.hasNext()) {
+            Commit temp = commitIterator.next().getValue();
+            if (commitChain.isHead(temp)) System.out.println("****current HEAD****");
+            System.out.println(temp);
+            System.out.println("===");
+        }
+    }
+
     private void init(String[] args) {
         Utils.checkArgsValid(args, 1);
         Utils.createDir(Utils.getGitDirPath());
         Utils.createDir(Utils.getCommitPath());
-        Utils.createDir(Utils.getStagePath());
+        Utils.createDir(stage.getStagePath());
         commit(new String[]{"commit", "initial commit"}, true);
     }
 
@@ -100,13 +136,32 @@ public class Gitlet {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
         Iterator<Commit> endIterator = commitChain.iterator();
-        //DFS正向打印
         while(endIterator.hasNext()) {
-            Commit curCommit = endIterator.next();
-            if (commitChain.isHead(curCommit)) System.out.println("****HEAD****");
-            System.out.println(curCommit);
-            System.out.println("---------------------------------------------");
+            Commit temp = endIterator.next();
+            if (commitChain.isHead(temp)) System.out.println("****current HEAD****");
+            System.out.println(temp);
+            System.out.println("===");
         }
+    }
+
+    private void merge(String[] args) {
+        Utils.checkInitialized();
+        Utils.checkArgsValid(args, 2);
+
+    }
+
+    private void reset(String[] args) {
+        Utils.checkInitialized();
+        Utils.checkArgsValid(args, 2);
+        try {
+            commitChain.resetTo(Utils.fromHash2DirName(args[1]));
+        } catch (NoSuchCommitException e) {
+            System.err.println("No such commit with hash: " + args[1]);
+            return;
+        }
+        Utils.copyAndReplace(Paths.get(commitChain.getHeadCommit().getCommitDir()), Paths.get(""));
+        stage.clear();
+        Utils.serializeCommitChain(commitChain);
     }
 
     private void rm(String[] args) {
@@ -118,10 +173,26 @@ public class Gitlet {
         } catch (IOException ignored) { }
     }
 
-    //TODO: refactor 去除隐藏文件夹的显示
+    private void rmBranch(String[] args) {
+        Utils.checkInitialized();
+        Utils.checkArgsValid(args, 2);
+        try {
+            commitChain.deleteBranch(args[1]);
+        } catch (DeleteCurrentBranchException e) {
+            System.err.println("Now checked out at branch: " + args[1] + ", can't delete it");
+            return;
+        } catch (NoSuchBranchException e) {
+            System.err.println("No such branch named " + args[1]);
+            return;
+        }
+        Utils.serializeCommitChain(commitChain);
+    }
+
+    //不够优雅，可是我也不知道该怎么重构了，法克
     private void status(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
+        //检查stage中和主文件夹的同步情况
         List<Path> stageFiles = stage.getStagedFiles();
         List<Path> untrackFiles = new ArrayList<>();
         List<Path> modifiedFiles = new ArrayList<>();
@@ -134,21 +205,22 @@ public class Gitlet {
                     modifiedFiles.add(temp);
                     i.remove();
                 }
-            } catch (NoSuchFileException e) {
-                continue;
-            }
-
+            } catch (NoSuchFileException ignored) { }
         }
+        //检查主文件夹下没有在stage中出现过的文件
         try {
-            i = Files.list(Paths.get("")).filter((p) -> (!p.startsWith("."))).iterator();
+            Stream<Path> files = Files.list(Paths.get("")).filter(path -> !(path.getFileName().toString().charAt(0)=='.'));
+            i = files.iterator();
             while(i.hasNext()) {
                 Path p = i.next();
-                Path temp = Utils.getStagePath().resolve(p);
+                Path temp = stage.getStagePath().resolve(p);
                 if (!Files.exists(temp)) untrackFiles.add(p);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("current working branch: " + commitChain.getCurBranchName());
+        System.out.println();
         System.out.println("Staged to be committed files:");
         stageFiles.forEach((p) -> System.out.println(p.getFileName().toString()));
         System.out.println();
@@ -162,14 +234,7 @@ public class Gitlet {
     private void find(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        String pattern = args[1];
-        LinkedList<Commit> results = commitChain.findCommitWithLog(pattern);
-        if (results.size() == 0) {
-            System.err.println("Found no commit with that message.");
-        } else {
-            for(Commit c : results)
-                System.out.println(c.getSHA1());
-        }
+        List<Commit> ans = commitChain.findCommitWithLog(args[1]);
+        ans.forEach(System.out::println);
     }
-
 }

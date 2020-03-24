@@ -42,6 +42,14 @@ public class Commit implements Serializable {
 
     public String getCommitStr() { return Utils.fromHash2DirName(SHA1); }
 
+    public int getSonsSize() {
+        return sons.size();
+    }
+
+    public boolean deleteSon(String sonName) {
+        return sons.remove(sonName);
+    }
+
     public void addCommit(String commitStr) {
         sons.add(commitStr);
     }

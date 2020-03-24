@@ -6,46 +6,43 @@ import java.util.List;
 public class Stage {
 
     private Path stagePath;
-    private int fileNumbers;
 
     public Stage(Path stagePath) {
         this.stagePath = stagePath;
-        fileNumbers = getStagedFiles().size();
     }
 
-    public void addFile(Path filePath) {
+    public Path getStagePath() {
+        return stagePath;
+    }
+
+    public void addFile(Path filePath) throws NoSuchFileException {
         try {
-            if (!Files.exists(stagePath.resolve(filePath.getFileName())))
-                fileNumbers++;
             Files.copy(filePath, stagePath.resolve(filePath.getFileName()), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            System.err.println("Can not find file: " + filePath.getFileName() + ".");
-            System.exit(0);
+            throw new NoSuchFileException("some words useless");
         }
-    }
-
-    public boolean inStaging(String filename) {
-        return Files.exists(stagePath.resolve(filename));
     }
 
     public List<Path> getStagedFiles(){
         List<Path> stagedFilePaths = new ArrayList<>();
         try {
-            Files.list(stagePath).filter((p) -> (!p.startsWith("."))).forEach(stagedFilePaths::add);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            Files.list(stagePath).filter((p) -> (!p.getFileName().startsWith("."))).forEach(stagedFilePaths::add);
+        } catch (IOException ignored) { }
         return stagedFilePaths;
     }
 
     public int getNumberOfStagedFile() {
-        return fileNumbers;
+        return getStagedFiles().size();
+    }
+
+    public void clear() {
+        List<Path> temp = getStagedFiles();
+        temp.forEach((path -> removeFile(path.toString())));
     }
 
     public void removeFile(String filename) {
         try {
             Files.delete(stagePath.resolve(filename));
-            fileNumbers--;
         } catch (IOException e) {
             System.err.println("No file named " + filename + " in staging area!");
             System.exit(0);
@@ -57,7 +54,6 @@ public class Stage {
         try {
             for (Path src : stagedFiles) {
                 Files.move(src, destDirPath.resolve(src.getFileName()));
-                fileNumbers--;
             }
         } catch (IOException e) {
             e.printStackTrace();

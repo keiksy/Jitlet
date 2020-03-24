@@ -1,15 +1,19 @@
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
+import java.security.*;
+import java.util.*;
+
+/**
+ * 工具类，封装一些常用操作
+ */
 
 public class Utils {
 
+    /**
+     * 分别记录了gitlet文件夹，commit目录，暂存目录和序列化commitChain的文件名称
+     * 主要供初始化Gitlet对象时使用，后面一般从对应的对象的getPath()方法中获得路径
+     */
     public static final String GIT_DIR_NAME = ".gitlet";
     public static final String COMMIT_DIR_NAME = "commit";
     public static final String STAGE_DIR_NAME = "stage";
@@ -31,6 +35,13 @@ public class Utils {
         return getGitDirPath().resolve(COMMIT_CHAIN_SERIALIZATION_NAME);
     }
 
+    /**
+     * 从SHA-1字符串中截取后6位
+     *
+     * 主要作为某次commit的目录名称使用
+     * @param hash SHA-1字符串
+     * @return hash的后六位
+     */
     public static String fromHash2DirName(String hash) { return hash.substring(hash.length()-6); }
 
     public static void checkArgsValid(String[] args, int argsLength) {
@@ -43,6 +54,9 @@ public class Utils {
         }
     }
 
+    /**
+     * 检查工作目录是否已经被初始化
+     */
     public static void checkInitialized() {
         if (!(Files.exists(getGitDirPath()) &&
                 Files.exists(getCommitPath()) &&
@@ -52,6 +66,11 @@ public class Utils {
         }
     }
 
+    /**
+     * 计算字符串的sha-1值
+     * @param str 输入字符串
+     * @return 该字符串的sha-1值
+     */
     public static String encrypt2SHA1(String str)  {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-1");
@@ -63,6 +82,13 @@ public class Utils {
         }
     }
 
+    /**
+     * 基于MD5值判断两个文本文件内容是否一样
+     * @param a 第一个文件
+     * @param b 第二个文件
+     * @return 两者是否一样
+     * @throws NoSuchFileException 无法读取其中某一个文件时抛出异常
+     */
     public static boolean isSameFiles(Path a, Path b) throws NoSuchFileException {
         try {
             MessageDigest md = MessageDigest.getInstance("MD5");
@@ -76,6 +102,12 @@ public class Utils {
         }
     }
 
+    /**
+     * 序列化指定commitChain对象
+     *
+     * 序列化的位置由本类的getCommitChainPath()函数指定
+     * @param cc commitChain对象
+     */
     public static void serializeCommitChain(CommitChain cc) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(getCommitChainPath().toString()));
@@ -86,6 +118,10 @@ public class Utils {
         }
     }
 
+    /**
+     * 创建指定文件夹
+     * @param path 指定路径的path对象
+     */
     public static void createDir(Path path) {
         try {
             Files.createDirectory(path);
@@ -98,6 +134,11 @@ public class Utils {
         }
     }
 
+    /**
+     * 复制并覆盖原有的同名文件，忽略了以.开头的UNIX隐藏文件
+     * @param from 源文件夹
+     * @param to 目的文件夹
+     */
     public static void copyAndReplace(Path from, Path to) {
         List<Path> srcFiles = new ArrayList<>();
         try {

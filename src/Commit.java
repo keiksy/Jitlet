@@ -3,6 +3,10 @@ import java.time.ZonedDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Commit结点
+ */
+
 public class Commit implements Serializable {
 
     private String parent;
@@ -32,10 +36,6 @@ public class Commit implements Serializable {
 
     public String getLog() {
         return log;
-    }
-
-    public String getSHA1() {
-        return SHA1;
     }
 
     public String getParentStr() { return parent; }

@@ -3,6 +3,10 @@ import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 抽象暂存区相关操作的类
+ * 事实上只是一个抽象了暂存区IO操作的类，并不记录和校验任何信息
+ */
 public class Stage {
 
     private Path stagePath;

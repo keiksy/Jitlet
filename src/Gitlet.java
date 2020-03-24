@@ -7,9 +7,14 @@ import java.util.*;
 import java.util.stream.Stream;
 
 /**
- * gitlet类负责初始化环境，IO和错误输出相关工作
- * Utils类封装一些常用操作和辅助函数
- * 具体业务逻辑交给commitchain类和stage类去执行
+ * Gitlet的主类，Gitlet从这里启动并接受命令实现所有功能
+ *
+ * Gitlet类实例化时，会首先尝试从当前工作目录下读取.commitChain文件
+ * 该文件是Gitlet底层数据结构的序列化文件
+ * 然后在commitChain引用的基础上完成业务操作
+ * stage对象负责维护暂存区的相关状态和操作
+ *
+ * @author keiksy
  */
 
 public class Gitlet {
@@ -38,6 +43,10 @@ public class Gitlet {
         }
     }
 
+    /**
+     * 将指定的文件复制到暂存区目录
+     * @param args 命令行参数
+     */
     private void add(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -48,6 +57,10 @@ public class Gitlet {
         }
     }
 
+    /**
+     * 新增一个分支，并让这个分支指向head结点
+     * @param args 命令行参数
+     */
     private void branch(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -60,6 +73,10 @@ public class Gitlet {
         Utils.serializeCommitChain(commitChain);
     }
 
+    /**
+     * 切换到指定分支
+     * @param args 命令行参数
+     */
     private void checkout(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -73,6 +90,18 @@ public class Gitlet {
         Utils.serializeCommitChain(commitChain);
     }
 
+    /**
+     * 在commitChain上添加一个Commit结点
+     *
+     * 首先生成提交时间，SHA-1和本次commit要保存的文件夹路径等必要信息
+     * 然后比较上次commit中文件的md5和这次是否一样，如果一样的话，停止commit
+     * 然后在commitChain上添加一个Commit结点，具体逻辑由commitChain实现
+     *
+     * 会对本Repo的第一次commit做出一些特别的优化，减少IO次数，其实并没有什么卵用
+     *
+     * @param args 命令行参数
+     * @param isFirstCommit 指示本次commit是否为本Repo的第一次commit
+     */
     private void commit(String[] args, boolean isFirstCommit) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -85,7 +114,6 @@ public class Gitlet {
                 System.err.println("No thing to commit, please check you staging area.");
                 return;
             }
-            //比较上次commit中文件的md5和这次是否一样，如果一样的话，停止commit
             List<Path> stagedFiles = stage.getStagedFiles();
             boolean isDiff = false;
             for (Path src : stagedFiles) {
@@ -112,6 +140,10 @@ public class Gitlet {
         Utils.serializeCommitChain(commitChain);
     }
 
+    /**
+     * 打印本Repo中所有的提交记录
+     * @param args 命令行参数
+     */
     private void globalLog(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
@@ -124,6 +156,13 @@ public class Gitlet {
         }
     }
 
+    /**
+     * 初始化Repo
+     *
+     * 创建三个文件夹，然后执行第一次commit
+     *
+     * @param args 命令行参数
+     */
     private void init(String[] args) {
         Utils.checkArgsValid(args, 1);
         Utils.createDir(Utils.getGitDirPath());
@@ -132,6 +171,10 @@ public class Gitlet {
         commit(new String[]{"commit", "initial commit"}, true);
     }
 
+    /**
+     * 按时间逆序打印当前branch上的所有提交
+     * @param args 命令行参数
+     */
     private void log(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
@@ -150,6 +193,12 @@ public class Gitlet {
 
     }
 
+    /**
+     * 将head改变到指定commit，同时文件夹内容也会恢复到commit时的快照内容
+     *
+     * head指针和当前branch的指针都会指向指定的Commit对象
+     * @param args 命令行参数
+     */
     private void reset(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -164,6 +213,10 @@ public class Gitlet {
         Utils.serializeCommitChain(commitChain);
     }
 
+    /**
+     * 删除暂存区的指定文件，同时也尝试删除工作目录的对应文件
+     * @param args 命令行参数
+     */
     private void rm(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -173,6 +226,10 @@ public class Gitlet {
         } catch (IOException ignored) { }
     }
 
+    /**
+     * 删除指定分支
+     * @param args 命令行参数
+     */
     private void rmBranch(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
@@ -188,7 +245,13 @@ public class Gitlet {
         Utils.serializeCommitChain(commitChain);
     }
 
-    //不够优雅，可是我也不知道该怎么重构了，法克
+    /**
+     * 打印提交状态，分为三种：
+     * 1. 成功暂存的文件
+     * 2. 在工作目录但是没有暂存的文件
+     * 3. 已经暂存但是在工作区已经被修改或者删除的文件
+     * @param args 命令行参数
+     */
     private void status(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
@@ -231,6 +294,10 @@ public class Gitlet {
         modifiedFiles.forEach((p) -> System.out.println(p.getFileName().toString()));
     }
 
+    /**
+     * 遍历所有Commit对象，打印出具有指定log的Commit对象
+     * @param args
+     */
     private void find(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);

@@ -2,26 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="232c890e-b9cb-4bf7-8786-56b059766ba8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Exceptions/AlreadyExistBranchException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Exceptions/DeleteCurrentBranchException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Exceptions/NoSuchBranchException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Exceptions/NoSuchCommitException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Exceptions/NoSuchException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/test/TestGitlet.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Jitlet.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Jitlet.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Commit.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Commit.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/CommitChain$CommitIterator.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/CommitChain$CommitIterator.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/CommitChain.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/CommitChain.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Gitlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Gitlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Playground.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Playground.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Stage.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Stage.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/Jitlet/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/Jitlet/Utils.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Commit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Commit.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/CommitChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CommitChain.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Gitlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Playground.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Playground.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Stage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stage.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils.java" afterDir="false" />
     </list>

@@ -1,5 +1,6 @@
 package Gitlet.Utility;
 
+import Gitlet.Blobs.Blob;
 import Gitlet.Blobs.BlobPool;
 import Gitlet.Commits.CommitChain;
 import Gitlet.Stage.Stage;
@@ -8,6 +9,7 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.*;
 import java.security.*;
+import java.util.List;
 
 /**
  * 工具类，封装一些常用操作
@@ -126,5 +128,17 @@ public class Utils {
         serializeCommitChain(cc);
         serializeStage(stage);
         serializeBlobPool(bp);
+    }
+
+    public static void syncFilesWithHeadCommit(CommitChain commitChain, BlobPool blobPool) {
+        List<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFiles();
+        for (String hash : hashesOfBackupFiles) {
+            Blob blob = blobPool.getFile(hash);
+            try {
+                Files.copy(blob.getPathGit(), blob.getPathRaw(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

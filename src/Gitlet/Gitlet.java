@@ -7,6 +7,7 @@ import Gitlet.Commits.CommitChain;
 import Gitlet.Utility.Exceptions.*;
 import Gitlet.Stage.Stage;
 import Gitlet.Utility.Utils;
+import jdk.jshell.execution.Util;
 
 import java.io.*;
 import java.nio.file.*;
@@ -73,7 +74,7 @@ public class Gitlet {
     }
 
     /**
-     * 新增一个分支，并让这个分支指向head结点
+     * 新增一个分支，并让这个分支指向head所指向的commit
      * @param args 命令行参数
      */
     private void branch(String[] args) {
@@ -82,7 +83,7 @@ public class Gitlet {
         try {
             commitChain.addBranch(args[1]);
         } catch (AlreadyExistBranchException e) {
-            System.err.println("Can't add the branch because it exsits.");
+            System.err.println("A branch with that name already exists.");
             System.exit(0);
         }
     }
@@ -97,19 +98,10 @@ public class Gitlet {
         try {
             commitChain.changeBranchTo(args[1]);
         } catch (NoSuchBranchException e) {
-            System.err.println("No such branch named " + args[1]);
+            System.err.println("No such branch exists.");
             System.exit(0);
         }
-        //恢复工作目录到目标commit的状态。
-        List<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFiles();
-        for (String hash : hashesOfBackupFiles) {
-            Blob blob = blobPool.getFile(hash);
-            try {
-                Files.copy(blob.getPathGit(), blob.getPathRaw(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Utils.syncFilesWithHeadCommit(commitChain, blobPool);
         stage.clear();
     }
 
@@ -117,11 +109,8 @@ public class Gitlet {
      * 在commitChain上添加一个Commit结点
      *
      * 首先生成提交时间，SHA-1和本次commit要保存的文件夹路径等必要信息
-     * 然后比较上次commit中文件的md5和这次是否一样，如果一样的话，停止commit
+     * 然后比较上次commit中文件的hash和这次是否一样，如果一样的话，停止commit
      * 然后在commitChain上添加一个Commit结点，具体逻辑由commitChain实现
-     *
-     * 会对本Repo的第一次commit做出一些特别的优化，减少IO次数，其实并没有什么卵用
-     *
      * @param args 命令行参数
      * @param isFirstCommit 指示本次commit是否为本Repo的第一次commit
      */
@@ -132,16 +121,13 @@ public class Gitlet {
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = Utils.encrypt(commitTime.toString(), "SHA-1");
         List<String> stagedFiles = stage.getHashesOfStagedFiles();
+        List<String> lastCommitFiles = commitChain.getHeadCommit().getFiles();
+        //第一次提交不需要检查提交文件的状况，因为没有上次提交，暂存区也不会有任何文件
         if (!isFirstCommit) {
-            if (stage.getNumberOfStagedFiles() == 0) {
-                System.err.println("No thing to commit, please check you staging area.");
-                System.exit(0);
-            }
-            //下面的代码比较了暂存区的文件内容和上次commit的文件内容是否相同
-            //所有暂存区文件的hash值构成的容器
-            List<String> lastCommitFiles = commitChain.getHeadCommit().getFiles();
-            if (lastCommitFiles.containsAll(stagedFiles)) {
-                System.err.println("There is no difference between last commit files and staging files.");
+            //如果跟踪文件为0个或者这次提交的文件和上次完全一样，就不用提交了
+            if (stage.getNumberOfStagedFiles()==0 ||
+                    (lastCommitFiles.containsAll(stagedFiles) && (lastCommitFiles.size()==stagedFiles.size()))) {
+                System.err.println("No changes added to the commit.");
                 System.exit(0);
             }
         }
@@ -167,8 +153,7 @@ public class Gitlet {
     /**
      * 初始化Repo
      *
-     * 创建三个文件夹，然后执行第一次commit
-     *
+     * 创建2个文件夹，然后执行第一次commit
      * @param args 命令行参数
      */
     private void init(String[] args) {
@@ -184,7 +169,7 @@ public class Gitlet {
     }
 
     /**
-     * 按时间逆序打印当前branch上的所有提交
+     * 按时间逆序打印当前branch上的所有提交历史
      * @param args 命令行参数
      */
     private void log(String[] args) {
@@ -206,7 +191,7 @@ public class Gitlet {
     /**
      * 将head改变到指定commit，同时文件夹内容也会恢复到commit时的快照内容
      *
-     * head指针和当前branch的指针都会指向指定的Commit对象
+     * 指定commit内所有文件快照都会被复制到它们原来所在的目录，替代现有的版本（如果现在存在的话）
      * @param args 命令行参数
      */
     private void reset(String[] args) {
@@ -215,24 +200,15 @@ public class Gitlet {
         try {
             commitChain.resetTo(Utils.fromHash2DirName(args[1]));
         } catch (NoSuchCommitException e) {
-            System.err.println("No such commit with hash: " + args[1]);
-            return;
+            System.err.println("No commit with that id exists.");
+            System.exit(0);
         }
-        //恢复工作目录到目标commit的状态。
-        List<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFiles();
-        for (String hash : hashesOfBackupFiles) {
-            Blob blob = blobPool.getFile(hash);
-            try {
-                Files.copy(blob.getPathGit(), blob.getPathRaw(), StandardCopyOption.REPLACE_EXISTING);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        Utils.syncFilesWithHeadCommit(commitChain, blobPool);
         stage.clear();
     }
 
     /**
-     * 删除暂存区的指定文件，同时也尝试删除工作目录的对应文件
+     * 删除暂存区的指定文件，同时也删除工作目录的对应文件
      * @param args 命令行参数
      */
     private void rm(String[] args) {
@@ -260,19 +236,19 @@ public class Gitlet {
         try {
             commitChain.deleteBranch(args[1]);
         } catch (DeleteCurrentBranchException e) {
-            System.err.println("Now checked out at branch: " + args[1] + ", can't delete it");
+            System.err.println("Cannot remove the current branch.");
             System.exit(0);
         } catch (NoSuchBranchException e) {
-            System.err.println("No such branch named " + args[1]);
+            System.err.println("A branch with that name does not exist.");
             System.exit(0);
         }
     }
 
     /**
-     * 打印提交状态，分为三种：
-     * 1. 成功暂存的文件
-     * 2. 在工作目录但是没有暂存的文件
-     * 3. 已经暂存但是在工作区已经被修改或者删除的文件
+     * 打印状态，分为三种：
+     * 1. 跟踪中的文件
+     * 2. 已经暂存但是在工作区已经被修改或者删除的文件
+     * 3. 工作目录中没有被跟踪的文件
      * @param args 命令行参数
      */
     private void status(String[] args) {
@@ -284,17 +260,21 @@ public class Gitlet {
         //检查已暂存文件的跟踪情况
         for(String hash : hashesOfStagedFiles) {
             Path dirRaw = blobPool.getFile(hash).getPathRaw();
+            //只要还在暂存区里，就是正在跟踪的文件
             trackingFiles.add(dirRaw.toString());
+            //用户使用shell的命令删除或移动了文件，导致原路径的文件找不到了，那就标记为被删除
             if (!Files.exists(dirRaw))
                 deletedFiles.add(dirRaw.toString());
+            //文件还在，但是跟暂存区的最新版本不一样了，那就是被修改过了，但是还没暂存
             else if (!Utils.encrypt(dirRaw, "SHA-1").equals(hash))
                 modifiedFiles.add(dirRaw.toString());
         }
-        //检查未暂存的文件
+        //检查工作目录下未跟踪的文件
         try {
+            //一个文件，如果他不属于上面三种的任何一个，就是未跟踪的文件
             Files.list(Paths.get("")).forEach((path -> {
                 String p = path.toString();
-                if (!(p.charAt(0)=='.') && !trackingFiles.contains(p) && !modifiedFiles.contains(p) && !deletedFiles.contains(p))
+                if (!(p.equals(Utils.GIT_DIR_NAME)) && !trackingFiles.contains(p) && !modifiedFiles.contains(p) && !deletedFiles.contains(p))
                     untrackFiles.add(p);
             }));
         } catch (IOException e) {
@@ -323,11 +303,16 @@ public class Gitlet {
     private void find(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
+        boolean noSuchCommit = true;
         Iterator<Map.Entry<String,Commit>> iterator = commitChain.getAllCommitsIterator();
         while(iterator.hasNext()) {
             Map.Entry<String,Commit> temp = iterator.next();
-            if (temp.getValue().getLog().equals(args[1]))
+            if (temp.getValue().getLog().equals(args[1])) {
                 System.out.println(temp.getValue());
+                noSuchCommit = false;
+            }
         }
+        if (noSuchCommit)
+            System.out.println("Found no commit with that message.");
     }
 }

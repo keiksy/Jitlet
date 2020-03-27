@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="232c890e-b9cb-4bf7-8786-56b059766ba8" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/src/Blobs/Blob.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Blobs/BlobPool.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/Exceptions/NotStagedException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Commit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Commit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/CommitChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/CommitChain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Stage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Stage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/TestGitlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/test/TestGitlet.java" afterDir="false" />
-    </list>
+    <list default="true" id="232c890e-b9cb-4bf7-8786-56b059766ba8" name="Default Changelist" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -33,7 +22,6 @@
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
@@ -48,7 +36,7 @@
   </component>
   <component name="RunManager" selected="Application.Gitlet">
     <configuration name="Gitlet" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Gitlet" />
+      <option name="MAIN_CLASS_NAME" value="Gitlet.Gitlet" />
       <module name="Jitlet" />
       <option name="PROGRAM_PARAMETERS" value="find 1" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../testgit" />
@@ -57,7 +45,7 @@
       </method>
     </configuration>
     <configuration name="Playground" type="Application" factoryName="Application" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="Playground" />
+      <option name="MAIN_CLASS_NAME" value="Gitlet.Playground" />
       <module name="Jitlet" />
       <option name="PROGRAM_PARAMETERS" value="init" />
       <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../testgit" />
@@ -126,6 +114,10 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="1154" y="235" key="#com.intellij.ide.util.MemberChooser/0.23.1920.1000@0.23.1920.1000" timestamp="1584714121911" />
+    <state x="685" y="454" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog" timestamp="1585310332650">
+      <screen x="0" y="23" width="1920" height="1000" />
+    </state>
+    <state x="685" y="454" key="#com.intellij.refactoring.move.MoveHandler.SelectRefactoringDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1585310332650" />
     <state x="723" y="236" key="#xdebugger.evaluate" timestamp="1584942717476">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
@@ -190,16 +182,5 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="625" y="244" width="670" height="676" key="search.everywhere.popup/0.23.1920.1000@0.23.1920.1000" timestamp="1585290222897" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/Gitlet.java</url>
-          <line>34</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
   </component>
 </project>

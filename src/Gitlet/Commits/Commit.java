@@ -1,3 +1,7 @@
+package Gitlet.Commits;
+
+import Gitlet.Utility.Utils;
+
 import java.io.Serializable;
 import java.time.ZonedDateTime;
 import java.util.LinkedList;
@@ -9,56 +13,49 @@ import java.util.List;
 
 public class Commit implements Serializable {
 
+    //the commitStr of parent commit.
     private String parent;
-    private List<String> sons;
+    //holds the commitStrs of son commits.
+    private List<String> sons = new LinkedList<>();
 
     private ZonedDateTime timestamp;
     private String log;
-    private String commitDir;
     private String SHA1;
     private String author;
+    //holds the hash values of commited files.
+    //files can be retrieved using hash value through the Gitlet.Gitlet.Blobs.BlobPool object.
+    private List<String> files;
 
-    public Commit(ZonedDateTime timestamp, String log, String commitDir,
+    public Commit(ZonedDateTime timestamp, String log, List<String> commitFiles,
                     String SHA1, String author, String parent) {
         this.timestamp = timestamp;
         this.log = log;
-        this.commitDir = commitDir;
         this.SHA1 = SHA1;
         this.author = author;
 
+        this.files = commitFiles;
         this.parent = parent;
-        sons = new LinkedList<>();
     }
 
-    public String getCommitDir() {
-        return commitDir;
-    }
+    public List<String> getFiles() { return files; }
 
     public String getLog() {
         return log;
     }
 
-    public String getParentStr() { return parent; }
+    public String getParentCommitStr() { return parent; }
 
     public String getCommitStr() { return Utils.fromHash2DirName(SHA1); }
 
-    public int getSonsSize() {
-        return sons.size();
-    }
-
-    public boolean deleteSon(String sonName) {
-        return sons.remove(sonName);
-    }
-
-    public void addCommit(String commitStr) {
+    public void addSonCommit(String commitStr) {
         sons.add(commitStr);
     }
 
     @Override
     public String toString() {
         return "Hash: "+SHA1+"\n"+
-                "Commit time: "+timestamp.toString()+"\n"+
-                "Commit log: "+log+"\n"+
+                "Gitlet.Commits.Commit time: "+timestamp.toString()+"\n"+
+                "Gitlet.Commits.Commit log: "+log+"\n"+
                 "Author: "+author;
     }
 

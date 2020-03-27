@@ -1,10 +1,17 @@
-import Exceptions.*;
+package Gitlet;
+
+import Gitlet.Blobs.Blob;
+import Gitlet.Blobs.BlobPool;
+import Gitlet.Commits.Commit;
+import Gitlet.Commits.CommitChain;
+import Gitlet.Utility.Exceptions.*;
+import Gitlet.Stage.Stage;
+import Gitlet.Utility.Utils;
 
 import java.io.*;
 import java.nio.file.*;
 import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.stream.Stream;
 
 /**
  * Gitlet的主类，Gitlet从这里启动并接受命令实现所有功能
@@ -19,12 +26,17 @@ import java.util.stream.Stream;
 
 public class Gitlet {
 
-    private CommitChain commitChain = CommitChain.deSerialFromPath(Utils.getCommitChainPath());
-    private Stage stage = new Stage(Utils.getStagePath());
+    private static BlobPool blobPool = BlobPool.deSerialFrom(Utils.getBlobsPath());
+    private static CommitChain commitChain = CommitChain.deSerialFrom(Utils.getCommitChainPath());
+    private static Stage stage = Stage.deSerialFrom(Utils.getStageFilePath());
 
     public static void main(String[] args) {
         Gitlet gitapp = new Gitlet();
 
+        if (args.length == 0) {
+            System.err.println("Please enter a command.");
+            return;
+        }
         switch (args[0]) {
             case "add": gitapp.add(args); break;
             case "branch": gitapp.branch(args); break;
@@ -39,21 +51,24 @@ public class Gitlet {
             case "rm": gitapp.rm(args); break;
             case "rm-branch": gitapp.rmBranch(args); break;
             case "status": gitapp.status(args);break;
-            default: System.err.println("Unknown command."); break;
+            default: System.err.println("No command with that name exists."); break;
         }
+        Utils.serializeAll(commitChain, stage, blobPool);
     }
 
     /**
-     * 将指定的文件复制到暂存区目录
+     * 暂存（跟踪）指定文件
      * @param args 命令行参数
      */
     private void add(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
         try {
-            stage.addFile(Paths.get(args[1]));
-        } catch (NoSuchFileException e) {
+            stage.trackFile(Paths.get(args[1]));
+            blobPool.addFile(Paths.get(args[1]));
+        } catch (IOException e) {
             System.err.println("No such file with name: " + args[1] + ".");
+            System.exit(0);
         }
     }
 
@@ -68,9 +83,8 @@ public class Gitlet {
             commitChain.addBranch(args[1]);
         } catch (AlreadyExistBranchException e) {
             System.err.println("Can't add the branch because it exsits.");
-            return;
+            System.exit(0);
         }
-        Utils.serializeCommitChain(commitChain);
     }
 
     /**
@@ -84,10 +98,19 @@ public class Gitlet {
             commitChain.changeBranchTo(args[1]);
         } catch (NoSuchBranchException e) {
             System.err.println("No such branch named " + args[1]);
-            return;
+            System.exit(0);
         }
-        Utils.copyAndReplace(Paths.get(commitChain.getHeadCommit().getCommitDir()), Paths.get(""));
-        Utils.serializeCommitChain(commitChain);
+        //恢复工作目录到目标commit的状态。
+        List<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFiles();
+        for (String hash : hashesOfBackupFiles) {
+            Blob blob = blobPool.getFile(hash);
+            try {
+                Files.copy(blob.getPathGit(), blob.getPathRaw(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        stage.clear();
     }
 
     /**
@@ -107,37 +130,22 @@ public class Gitlet {
         Utils.checkArgsValid(args, 2);
         String log = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
-        String hash = Utils.encrypt2SHA1(commitTime.toString());
-        Path destDirPath = Utils.getCommitPath().resolve(Utils.fromHash2DirName(hash));
+        String hash = Utils.encrypt(commitTime.toString(), "SHA-1");
+        List<String> stagedFiles = stage.getHashesOfStagedFiles();
         if (!isFirstCommit) {
-            if (stage.getNumberOfStagedFile() == 0) {
+            if (stage.getNumberOfStagedFiles() == 0) {
                 System.err.println("No thing to commit, please check you staging area.");
-                return;
+                System.exit(0);
             }
-            List<Path> stagedFiles = stage.getStagedFiles();
-            boolean isDiff = false;
-            for (Path src : stagedFiles) {
-                Path temp = Paths.get(commitChain.getHeadCommit().getCommitDir(), src.getFileName().toString());
-                try {
-                    if (!Utils.isSameFiles(src, temp)) {
-                        isDiff = true;
-                        break;
-                    }
-                } catch (IOException e) {
-                    isDiff = true;
-                    break;
-                }
-            }
-            if (!isDiff) {
-                System.err.println("There is no difference between head commit and staging files.");
-                System.err.println("Any changes won't be made.");
-                return;
+            //下面的代码比较了暂存区的文件内容和上次commit的文件内容是否相同
+            //所有暂存区文件的hash值构成的容器
+            List<String> lastCommitFiles = commitChain.getHeadCommit().getFiles();
+            if (lastCommitFiles.containsAll(stagedFiles)) {
+                System.err.println("There is no difference between last commit files and staging files.");
+                System.exit(0);
             }
         }
-        Utils.createDir(destDirPath);
-        if (!isFirstCommit) stage.moveStagedFileTo(destDirPath);
-        commitChain.newCommit(commitTime, log, destDirPath.toString(), hash, System.getProperty("user.name"));
-        Utils.serializeCommitChain(commitChain);
+        commitChain.newCommit(commitTime, log, stagedFiles, hash, System.getProperty("user.name"));
     }
 
     /**
@@ -165,9 +173,13 @@ public class Gitlet {
      */
     private void init(String[] args) {
         Utils.checkArgsValid(args, 1);
-        Utils.createDir(Utils.getGitDirPath());
-        Utils.createDir(Utils.getCommitPath());
-        Utils.createDir(stage.getStagePath());
+        try {
+            Files.createDirectory(Utils.getGitDirPath());
+            Files.createDirectory(Utils.getFilesPath());
+        } catch (IOException e) {
+            System.err.println("A Gitlet.Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
+        }
         commit(new String[]{"commit", "initial commit"}, true);
     }
 
@@ -178,10 +190,8 @@ public class Gitlet {
     private void log(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
-        Iterator<Commit> endIterator = commitChain.iterator();
-        while(endIterator.hasNext()) {
-            Commit temp = endIterator.next();
-            if (commitChain.isHead(temp)) System.out.println("****current HEAD****");
+        System.out.println("****current HEAD****");
+        for (Commit temp : commitChain) {
             System.out.println(temp);
             System.out.println("===");
         }
@@ -208,9 +218,17 @@ public class Gitlet {
             System.err.println("No such commit with hash: " + args[1]);
             return;
         }
-        Utils.copyAndReplace(Paths.get(commitChain.getHeadCommit().getCommitDir()), Paths.get(""));
+        //恢复工作目录到目标commit的状态。
+        List<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFiles();
+        for (String hash : hashesOfBackupFiles) {
+            Blob blob = blobPool.getFile(hash);
+            try {
+                Files.copy(blob.getPathGit(), blob.getPathRaw(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         stage.clear();
-        Utils.serializeCommitChain(commitChain);
     }
 
     /**
@@ -220,10 +238,16 @@ public class Gitlet {
     private void rm(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        stage.removeFile(args[1]);
         try {
-            Files.delete(Paths.get(args[1]));
-        } catch (IOException ignored) { }
+            String hashOfRemovedFile = stage.untrackFile(Paths.get(args[1]));
+            blobPool.rmFile(hashOfRemovedFile);
+        } catch (NotStagedException e) {
+            System.err.println("Not staged yet.");
+            System.exit(0);
+        } catch (IOException e) {
+            System.err.println("No file with this path exists.");
+            System.exit(0);
+        }
     }
 
     /**
@@ -237,12 +261,11 @@ public class Gitlet {
             commitChain.deleteBranch(args[1]);
         } catch (DeleteCurrentBranchException e) {
             System.err.println("Now checked out at branch: " + args[1] + ", can't delete it");
-            return;
+            System.exit(0);
         } catch (NoSuchBranchException e) {
             System.err.println("No such branch named " + args[1]);
-            return;
+            System.exit(0);
         }
-        Utils.serializeCommitChain(commitChain);
     }
 
     /**
@@ -255,43 +278,42 @@ public class Gitlet {
     private void status(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
-        //检查stage中和主文件夹的同步情况
-        List<Path> stageFiles = stage.getStagedFiles();
-        List<Path> untrackFiles = new ArrayList<>();
-        List<Path> modifiedFiles = new ArrayList<>();
-        Iterator<Path> i = stageFiles.iterator();
-        while(i.hasNext()) {
-            Path p = i.next();
-            Path temp = p.getFileName();
-            try {
-                if (!Utils.isSameFiles(temp, p)) {
-                    modifiedFiles.add(temp);
-                    i.remove();
-                }
-            } catch (NoSuchFileException ignored) { }
+        List<String> hashesOfStagedFiles = stage.getHashesOfStagedFiles();
+        List<String> untrackFiles = new ArrayList<>(), modifiedFiles = new ArrayList<>(),
+                deletedFiles = new ArrayList<>(), trackingFiles = new ArrayList<>();
+        //检查已暂存文件的跟踪情况
+        for(String hash : hashesOfStagedFiles) {
+            Path dirRaw = blobPool.getFile(hash).getPathRaw();
+            trackingFiles.add(dirRaw.toString());
+            if (!Files.exists(dirRaw))
+                deletedFiles.add(dirRaw.toString());
+            else if (!Utils.encrypt(dirRaw, "SHA-1").equals(hash))
+                modifiedFiles.add(dirRaw.toString());
         }
-        //检查主文件夹下没有在stage中出现过的文件
+        //检查未暂存的文件
         try {
-            Stream<Path> files = Files.list(Paths.get("")).filter(path -> !(path.getFileName().toString().charAt(0)=='.'));
-            i = files.iterator();
-            while(i.hasNext()) {
-                Path p = i.next();
-                Path temp = stage.getStagePath().resolve(p);
-                if (!Files.exists(temp)) untrackFiles.add(p);
-            }
+            Files.list(Paths.get("")).forEach((path -> {
+                String p = path.toString();
+                if (!(p.charAt(0)=='.') && !trackingFiles.contains(p) && !modifiedFiles.contains(p) && !deletedFiles.contains(p))
+                    untrackFiles.add(p);
+            }));
         } catch (IOException e) {
             e.printStackTrace();
+            System.exit(0);
         }
         System.out.println("current working branch: " + commitChain.getCurBranchName());
         System.out.println();
-        System.out.println("Staged to be committed files:");
-        stageFiles.forEach((p) -> System.out.println(p.getFileName().toString()));
-        System.out.println();
-        System.out.println("Untracked files:");
-        untrackFiles.forEach((p) -> System.out.println(p.getFileName().toString()));
+        System.out.println("tracking files:");
+        trackingFiles.forEach(System.out::println);
         System.out.println();
         System.out.println("Staged but modified files:");
-        modifiedFiles.forEach((p) -> System.out.println(p.getFileName().toString()));
+        modifiedFiles.forEach(System.out::println);
+        System.out.println();
+        System.out.println("Staged but removed files:");
+        deletedFiles.forEach(System.out::println);
+        System.out.println();
+        System.out.println("Untracked files:");
+        untrackFiles.forEach(System.out::println);
     }
 
     /**
@@ -301,7 +323,11 @@ public class Gitlet {
     private void find(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-        List<Commit> ans = commitChain.findCommitWithLog(args[1]);
-        ans.forEach(System.out::println);
+        Iterator<Map.Entry<String,Commit>> iterator = commitChain.getAllCommitsIterator();
+        while(iterator.hasNext()) {
+            Map.Entry<String,Commit> temp = iterator.next();
+            if (temp.getValue().getLog().equals(args[1]))
+                System.out.println(temp.getValue());
+        }
     }
 }

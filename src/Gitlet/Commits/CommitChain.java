@@ -11,8 +11,6 @@ import java.util.*;
  * commitChain的数据结构操作类
  *
  * commitChain是一个链表表示的K叉树
- * 所有的commit都在一个hashmap中存储
- * 所有的branch使用{branch : commitStr}的形式在hashmap中存储
  */
 
 public class CommitChain implements Serializable , Iterable<Commit>{
@@ -160,14 +158,6 @@ public class CommitChain implements Serializable , Iterable<Commit>{
      */
     private class CommitIterator implements Iterator<Commit> {
         Commit cur = getHeadCommit();
-
-        public CommitIterator() {}
-
-        public CommitIterator(String commitStr) {
-            try {
-                cur = getCommit(commitStr);
-            } catch (NoSuchCommitException ignored) {}
-        }
 
         @Override
         public boolean hasNext() {

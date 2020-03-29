@@ -4,19 +4,19 @@ import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Blob implements Serializable {
-    private String dirGit;
-    private String dirRaw;
-    private String hash;
+/**
+ * 抽象文件的类，用于表示gitlet内每个快照
+ */
 
-    public Blob(String dirGit, String dirRaw, String hash) {
+public class Blob implements Serializable {
+    //在.gitlet文件夹内该快照的位置
+    private String dirGit;
+    //在工作目录内源文件的地址
+    private String dirRaw;
+
+    Blob(String dirGit, String dirRaw) {
         this.dirGit = dirGit;
         this.dirRaw = dirRaw;
-        this.hash = hash;
-    }
-
-    public String getHash() {
-        return hash;
     }
 
     public Path getPathGit() {

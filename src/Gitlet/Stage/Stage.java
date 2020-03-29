@@ -12,7 +12,6 @@ import java.util.*;
 
 /**
  * 抽象暂存区相关操作的类
- *
  */
 public class Stage implements Serializable {
 

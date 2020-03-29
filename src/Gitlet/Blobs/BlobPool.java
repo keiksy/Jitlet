@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import Gitlet.Utility.Utils;
@@ -31,7 +32,7 @@ public class BlobPool implements Serializable {
         if (!pool.containsKey(hash)) {
             Path destFile = destDir.resolve(hash);
             Files.copy(file, destFile);
-            pool.put(hash, new Blob(destFile.toString(), file.toString(), hash));
+            pool.put(hash, new Blob(destFile.toString(), file.toString()));
         }
     }
 

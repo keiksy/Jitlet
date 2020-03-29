@@ -63,7 +63,7 @@ public class Gitlet {
             stage.trackFile(Paths.get(args[1]));
             blobPool.addFile(Paths.get(args[1]));
         } catch (IOException e) {
-            System.err.println("No such file with name: " + args[1] + ".");
+            System.err.println("No file with that name exists ");
             System.exit(0);
         }
     }
@@ -149,7 +149,7 @@ public class Gitlet {
     /**
      * 初始化Repo
      *
-     * 创建2个文件夹，然后执行第一次commit
+     * 创建2个文件夹: .gitlet和object，前者用于记录git仓库，后者用于保存文件快照，然后执行第一次commit
      * @param args 命令行参数
      */
     private void init(String[] args) {
@@ -165,26 +165,33 @@ public class Gitlet {
     }
 
     /**
-     * 按时间逆序打印当前branch上的所有提交历史
+     * 按时间逆序打印当前branch上的所有提交历史，直到全局的第一次提交
      * @param args 命令行参数
      */
     private void log(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 1);
-        System.out.println("****current HEAD****");
         for (Commit temp : commitChain) {
             System.out.println(temp);
             System.out.println("===");
         }
     }
 
+    /**
+     * 合并两个文件，使用三路归并算法
+     * 一个较好的解释参见https://blog.walterlv.com/post/git-merge-principle.html
+     * 详细算法参见CommitChain::mergeWithBranch方法的注释
+     */
     private void merge(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
+        //下面的几行注释代码是为了解决当前暂存区还有文件时进行merge的问题：是直接忽略还是提示用户提交暂存后再做决定
+        //为了偷懒，我毅然选择了前者
 //        if (stage.getNumberOfStagedFiles() != 0) {
 //            System.err.println("There are files in stageing area. Please remove or commit them first.");
 //            System.exit(0);
 //        }
+        //我不能跟自己merge啊
         if (commitChain.getCurBranchName().equals(args[1])) {
             System.err.println("can not merge with the branch itself.");
             System.exit(0);
@@ -197,12 +204,16 @@ public class Gitlet {
             System.err.println("No branch with that name exists.");
             System.exit(0);
         } catch (ReverseMergeException e) {
+            //孙子要跟爷爷merge，开倒车不行
             System.err.println("can not merge with a branch that is the ancester of current working branch.");
             System.exit(0);
         } catch (MergeException e) {
-            System.err.println("conflic at "+ e.getConflictSource());
+            //三方的文件都不相同，无法决策保留哪个
+            //其实有算法可以更加智能地解决这个问题，但是我菜啊啊啊啊啊，又菜又懒啊啊啊
+            System.err.println("conflict when merge "+ e.getConflictSource());
             System.exit(0);
         }
+        Utils.syncFilesWithHeadCommit(commitChain, blobPool);
         stage.clear();
     }
 
@@ -254,7 +265,7 @@ public class Gitlet {
         try {
             commitChain.deleteBranch(args[1]);
         } catch (DeleteCurrentBranchException e) {
-            System.err.println("Cannot remove the current branch.");
+            System.err.println("Can not remove the current branch.");
             System.exit(0);
         } catch (NoSuchBranchException e) {
             System.err.println("A branch with that name does not exist.");

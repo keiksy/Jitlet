@@ -9,7 +9,9 @@ import java.io.*;
 import java.math.BigInteger;
 import java.nio.file.*;
 import java.security.*;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 工具类，封装一些常用操作
@@ -131,7 +133,7 @@ public class Utils {
     }
 
     public static void syncFilesWithHeadCommit(CommitChain commitChain, BlobPool blobPool) {
-        List<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFiles();
+        Collection<String> hashesOfBackupFiles = commitChain.getHeadCommit().getFileHashes();
         for (String hash : hashesOfBackupFiles) {
             Blob blob = blobPool.getFile(hash);
             try {

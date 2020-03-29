@@ -12,7 +12,7 @@ import java.util.*;
 
 /**
  * 抽象暂存区相关操作的类
- * 事实上只是一个抽象了暂存区IO操作的类，并不记录和校验任何信息
+ *
  */
 public class Stage implements Serializable {
 
@@ -38,6 +38,9 @@ public class Stage implements Serializable {
     public List<String> getHashesOfStagedFiles(){
         return new ArrayList<>(tracking.values());
     }
+
+    //不能直接暴露，重写
+    public Map<String, String> getTracking() { return tracking; }
 
     public int getNumberOfStagedFiles() {
         return tracking.size();

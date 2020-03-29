@@ -4,8 +4,7 @@ import Gitlet.Utility.Utils;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Commit结点
@@ -15,6 +14,7 @@ public class Commit implements Serializable {
 
     //the commitStr of parent commit.
     private String parent;
+    private String secondParent;
     //holds the commitStrs of son commits.
     private List<String> sons = new LinkedList<>();
 
@@ -24,9 +24,9 @@ public class Commit implements Serializable {
     private String author;
     //holds the hash values of commited files.
     //files can be retrieved using hash value through the Gitlet.Gitlet.Blobs.BlobPool object.
-    private List<String> files;
+    private Map<String, String> files;
 
-    public Commit(ZonedDateTime timestamp, String log, List<String> commitFiles,
+    public Commit(ZonedDateTime timestamp, String log, Map<String, String> commitFiles,
                     String SHA1, String author, String parent) {
         this.timestamp = timestamp;
         this.log = log;
@@ -37,15 +37,31 @@ public class Commit implements Serializable {
         this.parent = parent;
     }
 
-    public List<String> getFiles() { return files; }
+    public Commit(ZonedDateTime timestamp, String log, Map<String, String> commitFiles,
+                  String SHA1, String author, String parent, String secondParent) {
+        this(timestamp, log, commitFiles, SHA1, author, parent);
+        this.secondParent = secondParent;
+    }
+
+    public Set<Map.Entry<String, String>> getFileEntries() { return files.entrySet(); }
+
+    public Set<String> getFileNames() { return files.keySet(); }
+
+    public Collection<String> getFileHashes() { return files.values(); }
 
     public String getLog() {
         return log;
     }
 
+    public boolean containsFileName(String filename) { return files.containsKey(filename);}
+
+    public String getHashOfFile(String filename) { return files.get(filename); }
+
     public String getParentCommitStr() { return parent; }
 
     public String getCommitStr() { return Utils.fromHash2DirName(SHA1); }
+
+    List<String> getSons() { return sons; }
 
     public void addSonCommit(String commitStr) {
         sons.add(commitStr);

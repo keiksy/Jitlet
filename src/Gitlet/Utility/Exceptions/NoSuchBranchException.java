@@ -1,4 +1,4 @@
 package Gitlet.Utility.Exceptions;
 
-public class NoSuchBranchException extends NoSuchException {
+public class NoSuchBranchException extends Exception {
 }

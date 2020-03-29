@@ -1,13 +1,11 @@
 package Gitlet;
 
-import Gitlet.Blobs.Blob;
 import Gitlet.Blobs.BlobPool;
 import Gitlet.Commits.Commit;
 import Gitlet.Commits.CommitChain;
 import Gitlet.Utility.Exceptions.*;
 import Gitlet.Stage.Stage;
 import Gitlet.Utility.Utils;
-import jdk.jshell.execution.Util;
 
 import java.io.*;
 import java.nio.file.*;
@@ -17,11 +15,8 @@ import java.util.*;
 /**
  * Gitlet的主类，Gitlet从这里启动并接受命令实现所有功能
  *
- * Gitlet类实例化时，会首先尝试从当前工作目录下读取.commitChain文件
- * 该文件是Gitlet底层数据结构的序列化文件
- * 然后在commitChain引用的基础上完成业务操作
- * stage对象负责维护暂存区的相关状态和操作
- *
+ * Gitlet类实例化时，会首先尝试从当前工作目录下反序列化commitChain，stage，blobpool三个文件
+ * 分别是是Gitlet底层数据结构的序列化文件、暂存区记录、文件池（保存了所有文件的所有版本的快照）
  * @author keiksy
  */
 
@@ -120,16 +115,17 @@ public class Gitlet {
         String log = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = Utils.encrypt(commitTime.toString(), "SHA-1");
-        List<String> stagedFiles = stage.getHashesOfStagedFiles();
-        List<String> lastCommitFiles = commitChain.getHeadCommit().getFiles();
+        Map<String, String> stagedFiles = stage.getTracking();
         //第一次提交不需要检查提交文件的状况，因为没有上次提交，暂存区也不会有任何文件
         if (!isFirstCommit) {
+            Collection<String> lastCommitFiles = commitChain.getHeadCommit().getFileHashes();
             //如果跟踪文件为0个或者这次提交的文件和上次完全一样，就不用提交了
             if (stage.getNumberOfStagedFiles()==0 ||
-                    (lastCommitFiles.containsAll(stagedFiles) && (lastCommitFiles.size()==stagedFiles.size()))) {
+                    (lastCommitFiles.containsAll(stagedFiles.values()) && (lastCommitFiles.size()==stagedFiles.size()))) {
                 System.err.println("No changes added to the commit.");
                 System.exit(0);
             }
+            //检查暂存区跟踪的文件有没有
         }
         commitChain.newCommit(commitTime, log, stagedFiles, hash, System.getProperty("user.name"));
     }
@@ -185,7 +181,29 @@ public class Gitlet {
     private void merge(String[] args) {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
-
+//        if (stage.getNumberOfStagedFiles() != 0) {
+//            System.err.println("There are files in stageing area. Please remove or commit them first.");
+//            System.exit(0);
+//        }
+        if (commitChain.getCurBranchName().equals(args[1])) {
+            System.err.println("can not merge with the branch itself.");
+            System.exit(0);
+        }
+        try {
+            ZonedDateTime commitTime = ZonedDateTime.now();
+            String hash = Utils.encrypt(commitTime.toString(), "SHA-1");
+            commitChain.mergeWithBranch(commitTime, hash, System.getProperty("user.name"), args[1]);
+        } catch (NoSuchBranchException e) {
+            System.err.println("No branch with that name exists.");
+            System.exit(0);
+        } catch (ReverseMergeException e) {
+            System.err.println("can not merge with a branch that is the ancester of current working branch.");
+            System.exit(0);
+        } catch (MergeException e) {
+            System.err.println("conflic at "+ e.getConflictSource());
+            System.exit(0);
+        }
+        stage.clear();
     }
 
     /**

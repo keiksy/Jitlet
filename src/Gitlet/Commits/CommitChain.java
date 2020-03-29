@@ -53,7 +53,7 @@ public class CommitChain implements Serializable , Iterable<Commit>{
      * @param SHA1 sha-1字符串
      * @param author commit的作者
      */
-    public void newCommit(ZonedDateTime timestamp, String log, List<String> commitFiles,
+    public void newCommit(ZonedDateTime timestamp, String log, Map<String, String> commitFiles,
                           String SHA1, String author) {
         Commit commit;
         if (chain == null) {
@@ -73,7 +73,18 @@ public class CommitChain implements Serializable , Iterable<Commit>{
      */
     public Commit getHeadCommit() {
         try {
-            return getCommit(branches.get(head));
+            return getCommitByBranch(head);
+        } catch (NoSuchBranchException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Commit getCommitByBranch(String branch) throws NoSuchBranchException {
+        if (!branches.containsKey(branch))
+            throw new NoSuchBranchException();
+        try {
+            return getCommit(branches.get(branch));
         } catch (NoSuchCommitException e) {
             e.printStackTrace();
             return null;
@@ -178,12 +189,123 @@ public class CommitChain implements Serializable , Iterable<Commit>{
         return new CommitIterator();
     }
 
-    /**
-     * 获取从指定commitStr对应的Commit对象开始的迭代器
-     *
-     * 就是从commitStr对应的那个Commit对象开始"倒着走"
-     */
-    private Iterator<Commit> getIteratorFromCommit(String commitStr) {
-        return new CommitIterator(commitStr);
+    public Commit findLCACommitByBranch(String branchA, String branchB) throws NoSuchBranchException {
+        String commitStrA = branches.get(branchA), commitStrB = branches.get(branchB);
+        if (commitStrA==null || commitStrB==null)
+            throw new NoSuchBranchException();
+        try {
+            return findLCACommitByCommitStr(commitStrA, commitStrB);
+        } catch (NoSuchCommitException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Commit findLCACommitByCommitStr(String commitStrA, String commitStrB) throws NoSuchCommitException {
+        Commit a = getCommit(commitStrA), b = getCommit(commitStrB);
+        if (commitStrA.equals(commitStrB))
+            return a;
+        LCAHelper(chain, a, b);
+        return LCA;
+    }
+
+    private Commit LCA;
+
+    private int LCAHelper(Commit root, Commit a, Commit b) {
+        List<String> sons = root.getSons();
+        int point = 0;
+        if (root==a || root==b)
+            point++;
+        for (String son : sons) {
+            try {
+                Commit temp = getCommit(son);
+                point += LCAHelper(temp, a, b);
+            } catch (NoSuchCommitException ignored) {}
+        }
+        if (point == 2) {
+            LCA = root;
+            return 0;
+        }
+        return point;
+    }
+
+    public void mergeWithBranch(ZonedDateTime timestamp, String hash, String author, String branch) throws NoSuchBranchException, ReverseMergeException, MergeException {
+        //不存在要合并的branch，异常
+        if (!branches.containsKey(branch))
+            throw new NoSuchBranchException();
+        //共同祖先
+        Commit lca = findLCACommitByBranch(head, branch);
+        Commit cur = getHeadCommit();
+        Commit object = getCommitByBranch(branch);
+        if (cur == object)
+            return;
+        //如果目标分支是当前分支的祖先，合并失败
+        if (lca == object)
+            throw new ReverseMergeException();
+        //如果当前分支是目标分支的祖先，快进调整当前branch指针即可
+        if (lca == cur) {
+            branches.put(head, branches.get(branch));
+            return;
+        }
+        //其余情况就是分叉了，目标分支和当前分支不在一条线上
+        /*
+        1. 祖先和head一样，但是obj不一样的，按照obj来
+        2. 祖先和obj一样，但是head不一样的，按照head来
+        3. Obj和head一样，但是和祖先不一样的，按照obj来（不动）
+        4. Obj和head都无，但是祖先有的文件，删掉
+        5. Obj，head，祖先都有的文件（名），但是版本都不一样，冲突，不动并报错
+        操你妈，傻逼逻辑，写死我了
+         */
+        Set<String> lcaFileNames = lca.getFileNames(), curFileNames = cur.getFileNames(), objFileNames = object.getFileNames();
+        Map<String, String> mergeResultFiles = new HashMap<>();
+        for(String filename : lcaFileNames) {
+            if (cur.containsFileName(filename) && object.containsFileName(filename)) {
+                String curHash = cur.getHashOfFile(filename),
+                        lcaHash = lca.getHashOfFile(filename),
+                        objHash = object.getHashOfFile(filename);
+                if (curHash.equals(lcaHash) && objHash.equals(lcaHash))
+                    mergeResultFiles.put(filename, lcaHash);
+                else if (curHash.equals(lcaHash) && !objHash.equals(lcaHash))
+                    mergeResultFiles.put(filename, objHash);
+                else if (!curHash.equals(lcaHash) && objHash.equals(lcaHash))
+                    mergeResultFiles.put(filename, curHash);
+                else
+                    throw new MergeException(filename);
+            } else if (cur.containsFileName(filename) && !object.containsFileName(filename))
+                mergeResultFiles.put(filename, cur.getHashOfFile(filename));
+            else if (!cur.containsFileName(filename) && object.containsFileName(filename))
+                mergeResultFiles.put(filename, object.getHashOfFile(filename));
+        }
+
+        for(String filename : curFileNames) {
+            if (!lcaFileNames.contains(filename)) {
+                if (!objFileNames.contains(filename) || object.getHashOfFile(filename).equals(cur.getHashOfFile(filename)))
+                    mergeResultFiles.put(filename, cur.getHashOfFile(filename));
+                else
+                    throw new MergeException(filename);
+            }
+        }
+
+        for(String filename : objFileNames) {
+            if (!lcaFileNames.contains(filename)) {
+                if (!curFileNames.contains(filename) || cur.getHashOfFile(filename).equals(object.getHashOfFile(filename)))
+                    mergeResultFiles.put(filename, object.getHashOfFile(filename));
+                else
+                    throw new MergeException(filename);
+            }
+        }
+        newMergeCommit(timestamp, "merged by "+head+" and "+branch, mergeResultFiles, hash, author, branch);
+    }
+
+    private void newMergeCommit(ZonedDateTime timestamp, String log, Map<String, String> commitFiles,
+                           String SHA1, String author, String objectBranch) {
+        Commit commit = new Commit(timestamp, log, commitFiles, SHA1, author, branches.get(head), branches.get(objectBranch));
+        getHeadCommit().addSonCommit(commit.getCommitStr());
+        try {
+            getCommitByBranch(objectBranch).addSonCommit(commit.getCommitStr());
+        } catch (NoSuchBranchException ignored) { }
+        commits.put(commit.getCommitStr(), commit);
+        branches.put(head, commit.getCommitStr());
+        branches.put(objectBranch, commit.getCommitStr());
     }
 }

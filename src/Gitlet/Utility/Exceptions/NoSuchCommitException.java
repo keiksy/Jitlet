@@ -1,4 +1,4 @@
 package Gitlet.Utility.Exceptions;
 
-public class NoSuchCommitException extends NoSuchException {
+public class NoSuchCommitException extends Exception {
 }

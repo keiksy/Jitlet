@@ -3,13 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="232c890e-b9cb-4bf7-8786-56b059766ba8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Blobs/Blob.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Blobs/Blob.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Blobs/BlobPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Blobs/BlobPool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Commits/Commit.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Commits/Commit.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Commits/CommitChain.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Commits/CommitChain.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Gitlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Gitlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Stage/Stage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Stage/Stage.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Gitlet/Utility/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Utility/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

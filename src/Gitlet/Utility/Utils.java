@@ -141,4 +141,8 @@ public class Utils {
             }
         }
     }
+
+    public static String getRelativeDir(Path path) {
+        return Paths.get("").relativize(path).toString();
+    }
 }

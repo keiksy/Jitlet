@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import Gitlet.Utility.Utils;
 
@@ -25,14 +26,16 @@ public class BlobPool implements Serializable {
         }
     }
 
-    public void addFile(Path file) throws IOException{
-        Path destDir = Utils.getFilesPath().resolve(file.getFileName());
-        String hash = Utils.encrypt(file, "SHA-1");
-        if (!Files.exists(destDir)) Files.createDirectory(destDir);
-        if (!pool.containsKey(hash)) {
-            Path destFile = destDir.resolve(hash);
-            Files.copy(file, destFile);
-            pool.put(hash, new Blob(destFile.toString(), file.toString()));
+    public void addFile(List<Path> files) throws IOException{
+        for (Path file : files) {
+            Path destDir = Utils.getFilesPath().resolve(Utils.getRelativeDir(file));
+            String hash = Utils.encrypt(file, "SHA-1");
+            if (!Files.exists(destDir)) Files.createDirectories(destDir);
+            if (!pool.containsKey(hash)) {
+                Path destFile = destDir.resolve(hash);
+                Files.copy(file, destFile);
+                pool.put(hash, new Blob(destFile.toString(), file.toString()));
+            }
         }
     }
 

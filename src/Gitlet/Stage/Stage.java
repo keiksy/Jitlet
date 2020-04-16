@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.nio.file.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 抽象暂存区相关操作的类
@@ -28,10 +29,12 @@ public class Stage implements Serializable {
         }
     }
 
-    public void trackFile(Path file) {
-        String filename = file.getFileName().toString();
-        String sha1 = Utils.encrypt(file, "SHA-1");
-        tracking.put(filename, sha1);
+    public void trackFile(List<Path> files) {
+        for(Path file : files) {
+            String s = Utils.getRelativeDir(file);
+            String sha1 = Utils.encrypt(file, "SHA-1");
+            tracking.put(s, sha1);
+        }
     }
 
     public List<String> getHashesOfStagedFiles(){

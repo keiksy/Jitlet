@@ -11,6 +11,7 @@ import java.io.*;
 import java.nio.file.*;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Gitlet的主类，Gitlet从这里启动并接受命令实现所有功能
@@ -60,8 +61,12 @@ public class Gitlet {
         Utils.checkInitialized();
         Utils.checkArgsValid(args, 2);
         try {
-            stage.trackFile(Paths.get(args[1]));
-            blobPool.addFile(Paths.get(args[1]));
+            String s = args[1];
+            if (s.equals(".")) s = "";
+            Path path = Paths.get(s);
+            List<Path> files = Files.walk(path).filter((p) -> (!Files.isDirectory(p) && !(p.toString().charAt(0)=='.'))).collect(Collectors.toList());
+            stage.trackFile(files);
+            blobPool.addFile(files);
         } catch (IOException e) {
             System.err.println("No file with that name exists ");
             System.exit(0);

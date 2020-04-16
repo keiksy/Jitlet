@@ -1,9 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="232c890e-b9cb-4bf7-8786-56b059766ba8" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Gitlet/Blobs/BlobPool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Blobs/BlobPool.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Gitlet/Gitlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Gitlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Gitlet/Stage/Stage.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Stage/Stage.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Gitlet/Utility/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/Utility/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Gitlet/pg.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Gitlet/pg.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,7 +47,6 @@
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
-    <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
@@ -33,16 +54,19 @@
     <property name="Repository.Attach.Annotations" value="false" />
     <property name="Repository.Attach.JavaDocs" value="false" />
     <property name="Repository.Attach.Sources" value="false" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="settings.editor.selected.configurable" value="preferences.lookFeel" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.fonts.default" />
   </component>
   <component name="RunManager" selected="Application.Gitlet">
     <configuration name="Gitlet" type="Application" factoryName="Application" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Gitlet.Gitlet" />
       <module name="Jitlet" />
-      <option name="PROGRAM_PARAMETERS" value="merge master" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../testgit" />
+      <option name="PROGRAM_PARAMETERS" value="reset 96c75394d474193c2d6b3a9497ecf2797aea3c2c" />
+      <option name="WORKING_DIRECTORY" value="$USER_HOME$/Desktop/testgit" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -113,8 +137,27 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1584549487391</updated>
+      <workItem from="1586764802277" duration="204000" />
+      <workItem from="1586789387155" duration="175000" />
+      <workItem from="1586854064443" duration="3702000" />
+      <workItem from="1587024962826" duration="8726000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="526" y="195" key="#TestGitlet.testRmbranch" timestamp="1584954040907">
@@ -125,10 +168,11 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="698" y="296" key="#com.intellij.codeInsight.editorActions.RestoreReferencesDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1584715998412" />
-    <state x="363" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1585493002916">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state x="363" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1587034434380">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state x="363" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1585493002916" />
+    <state x="363" y="198" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.23.1920.1003@0.23.1920.1003" timestamp="1587034434380" />
     <state x="736" y="178" width="782" height="573" key="#com.intellij.ide.macro.MacrosDialog" timestamp="1585031995215">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
@@ -149,38 +193,46 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="100" y="123" width="1720" height="800" key="DiffContextDialog/0.23.1920.1000@0.23.1920.1000" timestamp="1585338383836" />
-    <state width="1878" height="305" key="GridCell.Tab.0.bottom" timestamp="1585493618199">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="353" key="GridCell.Tab.0.bottom" timestamp="1587034409259">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.0.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618199" />
-    <state width="1878" height="305" key="GridCell.Tab.0.center" timestamp="1585493618199">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="353" key="GridCell.Tab.0.bottom/0.23.1920.1003@0.23.1920.1003" timestamp="1587034409259" />
+    <state width="1878" height="353" key="GridCell.Tab.0.center" timestamp="1587034409257">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.0.center/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618199" />
-    <state width="1878" height="305" key="GridCell.Tab.0.left" timestamp="1585493618198">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="353" key="GridCell.Tab.0.center/0.23.1920.1003@0.23.1920.1003" timestamp="1587034409257" />
+    <state width="1878" height="353" key="GridCell.Tab.0.left" timestamp="1587034409256">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.0.left/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618198" />
-    <state width="1878" height="305" key="GridCell.Tab.0.right" timestamp="1585493618199">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="353" key="GridCell.Tab.0.left/0.23.1920.1003@0.23.1920.1003" timestamp="1587034409256" />
+    <state width="1878" height="353" key="GridCell.Tab.0.right" timestamp="1587034409257">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.0.right/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618199" />
-    <state width="1878" height="305" key="GridCell.Tab.1.bottom" timestamp="1585493618200">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="353" key="GridCell.Tab.0.right/0.23.1920.1003@0.23.1920.1003" timestamp="1587034409257" />
+    <state width="1878" height="336" key="GridCell.Tab.1.bottom" timestamp="1587034355472">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.1.bottom/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618200" />
-    <state width="1878" height="305" key="GridCell.Tab.1.center" timestamp="1585493618200">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="336" key="GridCell.Tab.1.bottom/0.23.1920.1003@0.23.1920.1003" timestamp="1587034355472" />
+    <state width="1878" height="336" key="GridCell.Tab.1.center" timestamp="1587034355471">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.1.center/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618200" />
-    <state width="1878" height="305" key="GridCell.Tab.1.left" timestamp="1585493618200">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="336" key="GridCell.Tab.1.center/0.23.1920.1003@0.23.1920.1003" timestamp="1587034355471" />
+    <state width="1878" height="336" key="GridCell.Tab.1.left" timestamp="1587034355471">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.1.left/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618200" />
-    <state width="1878" height="305" key="GridCell.Tab.1.right" timestamp="1585493618200">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state width="1878" height="336" key="GridCell.Tab.1.left/0.23.1920.1003@0.23.1920.1003" timestamp="1587034355471" />
+    <state width="1878" height="336" key="GridCell.Tab.1.right" timestamp="1587034355472">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.1.right/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618200" />
+    <state width="1878" height="336" key="GridCell.Tab.1.right/0.23.1920.1003@0.23.1920.1003" timestamp="1587034355472" />
     <state width="1878" height="305" key="GridCell.Tab.2.bottom" timestamp="1585493618201">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
@@ -197,10 +249,11 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state width="1878" height="305" key="GridCell.Tab.2.right/0.23.1920.1000@0.23.1920.1000" timestamp="1585493618201" />
-    <state x="461" y="162" key="SettingsEditor" timestamp="1584763884054">
-      <screen x="0" y="23" width="1920" height="1000" />
+    <state x="461" y="162" key="SettingsEditor" timestamp="1586764852598">
+      <screen x="0" y="23" width="1920" height="1003" />
     </state>
     <state x="461" y="162" key="SettingsEditor/0.23.1920.1000@0.23.1920.1000" timestamp="1584763884054" />
+    <state x="461" y="162" key="SettingsEditor/0.23.1920.1003@0.23.1920.1003" timestamp="1586764852598" />
     <state x="664" y="426" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1585243096543">
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
@@ -213,5 +266,21 @@
       <screen x="0" y="23" width="1920" height="1000" />
     </state>
     <state x="625" y="244" width="670" height="676" key="search.everywhere.popup/0.23.1920.1000@0.23.1920.1000" timestamp="1585290222897" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Gitlet/pg.java</url>
+          <line>15</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/Gitlet/Gitlet.java</url>
+          <line>36</line>
+          <option name="timeStamp" value="7" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

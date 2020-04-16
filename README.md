@@ -2,6 +2,8 @@
 
 Jitlet即Gitlet的谐音，意为一个小型的Git，首字母J意在表明本项目由Java编写。
 
+Jitlet支持了绝大多数的版本控制功能。
+
 ## 功能
 
 1. 在当前目录初始化gitlet仓库：
@@ -82,11 +84,13 @@ java Gitlet rm-branch [branch_name]
 java Gitlet status
 ```
 
+14. 支持对文件夹进行版本控制操作
+
 理论上功能和`git status`一致。
 
 ## 待开发功能
 
-1. 子文件夹支持。
+~~1. 子文件夹支持。~~(2020/04/16填坑)
 2. 远程仓库相关功能。
 
 ## 参考文献

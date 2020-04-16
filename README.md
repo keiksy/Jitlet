@@ -83,10 +83,9 @@ java Gitlet rm-branch [branch_name]
 ```
 java Gitlet status
 ```
+功能和`git status`一致。
 
 14. 支持对文件夹进行版本控制操作
-
-理论上功能和`git status`一致。
 
 ## 待开发功能
 

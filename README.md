@@ -93,6 +93,15 @@ java Gitlet status
 
 2. 远程仓库相关功能。
 
+## 内部原理
+- Gitapp是主类，包含三大组件的单例：暂存区（Stage.java），提交树（CommitChain.java）和文件抽象池（BlobPool.java）
+- 暂存区就是stage，数据结构是将文件名（相对于git仓库主文件夹的相对路径）映射到文件的hash的Map
+- 提交树保存本Repo所有的提交，数据结构是将commitStr（一次Commit的hash字符串的前六位）映射为Commit对象的Map
+- 提交树还保存了本Repo所有的分支，数据结构是将分支名映射为commitStr的Map
+- 文件抽象池是为了实现特定文件名的特定版本只占用一次磁盘空间的优化，同时将磁盘IO操作和其他负责业务逻辑的类解耦，数据结构是
+将文件的hash映射为Blob对象的Map
+- Blob对象是对一个文件的抽象，跟踪了一个文件的磁盘位置和git文件夹内快照的位置
+
 ## 参考文献
 
 1. [CS61B-Project3-Gitlet](https://inst.eecs.berkeley.edu/~cs61b/fa19/materials/proj/proj3/index.html)

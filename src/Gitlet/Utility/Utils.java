@@ -50,22 +50,10 @@ public class Utils {
      */
     public static String fromHash2DirName(String hash) { return hash.substring(hash.length()-6); }
 
-    public static void checkArgsValid(String[] args, int argsLength) {
-        if (args.length != argsLength) {
-            System.err.println("Incorrect operands.");
-            System.exit(0);
-        }
-    }
-
     /**
      * 检查工作目录是否已经被初始化
      */
-    public static void checkInitialized() {
-        if (!Files.exists(getGitDirPath())) {
-            System.err.println("Not in an initialized Gitlet.Gitlet directory.");
-            System.exit(0);
-        }
-    }
+
 
     /**
      * 计算字符串的sha-1值

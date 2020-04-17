@@ -13,6 +13,8 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static Gitlet.Utility.Utils.getGitDirPath;
+
 /**
  * Gitlet的主类，Gitlet从这里启动并接受命令实现所有功能
  *
@@ -23,43 +25,62 @@ import java.util.stream.Collectors;
 
 public class Gitlet {
 
-    private static BlobPool blobPool = BlobPool.deSerialFrom(Utils.getBlobsPath());
-    private static CommitChain commitChain = CommitChain.deSerialFrom(Utils.getCommitChainPath());
-    private static Stage stage = Stage.deSerialFrom(Utils.getStageFilePath());
+    private static BlobPool blobPool;
+    private static CommitChain commitChain;
+    private static Stage stage;
 
     public static void main(String[] args) {
-        Gitlet gitapp = new Gitlet();
-
         if (args.length == 0) {
             System.err.println("Please enter a command.");
             return;
         }
-        switch (args[0]) {
-            case "add": gitapp.add(args); break;
-            case "branch": gitapp.branch(args); break;
-            case "checkout": gitapp.checkout(args); break;
-            case "commit": gitapp.commit(args, false); break;
-            case "find": gitapp.find(args); break;
-            case "global-log": gitapp.globalLog(args); break;
-            case "init": gitapp.init(args); break;
-            case "log": gitapp.log(args); break;
-            case "merge": gitapp.merge(args); break;
-            case "reset": gitapp.reset(args); break;
-            case "rm": gitapp.rm(args); break;
-            case "rm-branch": gitapp.rmBranch(args); break;
-            case "status": gitapp.status(args);break;
-            default: System.err.println("No command with that name exists."); break;
+
+        if (args[0].equals("init")) {
+            init(args);
+        } else {
+            if (!isInitialized()) {
+                System.err.println("Not in an initialized Gitlet.Gitlet directory.");
+                System.exit(0);
+            }
+            blobPool = BlobPool.deSerialFrom(Utils.getBlobsPath());
+            commitChain = CommitChain.deSerialFrom(Utils.getCommitChainPath());
+            stage = Stage.deSerialFrom(Utils.getStageFilePath());
+            switch (args[0]) {
+                case "add": add(args); break;
+                case "branch": branch(args); break;
+                case "checkout": checkout(args); break;
+                case "commit": commit(args, false); break;
+                case "find": find(args); break;
+                case "global-log": globalLog(args); break;
+                case "log": log(args); break;
+                case "merge": merge(args); break;
+                case "reset": reset(args); break;
+                case "rm": rm(args); break;
+                case "rm-branch": rmBranch(args); break;
+                case "status": status(args);break;
+                default: System.err.println("No command with that name exists."); break;
+            }
         }
         Utils.serializeAll(commitChain, stage, blobPool);
+    }
+
+    private static boolean isInitialized() {
+        return Files.exists(getGitDirPath());
+    }
+
+    private static void checkArgsValid(String[] args, int argsLength) {
+        if (args.length != argsLength) {
+            System.err.println("Incorrect operands.");
+            System.exit(0);
+        }
     }
 
     /**
      * 暂存（跟踪）指定文件
      * @param args 命令行参数
      */
-    private void add(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void add(String[] args) {
+        checkArgsValid(args, 2);
         try {
             String s = args[1];
             if (s.equals(".")) s = "";
@@ -77,9 +98,8 @@ public class Gitlet {
      * 新增一个分支，并让这个分支指向head所指向的commit
      * @param args 命令行参数
      */
-    private void branch(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void branch(String[] args) {
+        checkArgsValid(args, 2);
         try {
             commitChain.addBranch(args[1]);
         } catch (AlreadyExistBranchException e) {
@@ -92,9 +112,8 @@ public class Gitlet {
      * 切换到指定分支
      * @param args 命令行参数
      */
-    private void checkout(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void checkout(String[] args) {
+        checkArgsValid(args, 2);
         try {
             commitChain.changeBranchTo(args[1]);
         } catch (NoSuchBranchException e) {
@@ -114,13 +133,12 @@ public class Gitlet {
      * @param args 命令行参数
      * @param isFirstCommit 指示本次commit是否为本Repo的第一次commit
      */
-    private void commit(String[] args, boolean isFirstCommit) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void commit(String[] args, boolean isFirstCommit) {
+        checkArgsValid(args, 2);
         String log = args[1];
         ZonedDateTime commitTime = ZonedDateTime.now();
         String hash = Utils.encrypt(commitTime.toString(), "SHA-1");
-        Map<String, String> stagedFiles = stage.getTracking();
+        Map<String, String> stagedFiles = stage.getTrackingFiles();
         //第一次提交不需要检查提交文件的状况，因为没有上次提交，暂存区也不会有任何文件
         if (!isFirstCommit) {
             Collection<String> lastCommitFiles = commitChain.getHeadCommit().getFileHashes();
@@ -139,9 +157,8 @@ public class Gitlet {
      * 打印本Repo中所有的提交记录
      * @param args 命令行参数
      */
-    private void globalLog(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 1);
+    private static void globalLog(String[] args) {
+        checkArgsValid(args, 1);
         Iterator<Map.Entry<String, Commit>> commitIterator = commitChain.getAllCommitsIterator();
         while(commitIterator.hasNext()) {
             Commit temp = commitIterator.next().getValue();
@@ -157,13 +174,19 @@ public class Gitlet {
      * 创建2个文件夹: .gitlet和object，前者用于记录git仓库，后者用于保存文件快照，然后执行第一次commit
      * @param args 命令行参数
      */
-    private void init(String[] args) {
-        Utils.checkArgsValid(args, 1);
+    private static void init(String[] args) {
+        checkArgsValid(args, 1);
+        blobPool = new BlobPool();
+        commitChain = new CommitChain();
+        stage = new Stage();
         try {
-            Files.createDirectory(Utils.getGitDirPath());
+            Files.createDirectory(getGitDirPath());
             Files.createDirectory(Utils.getFilesPath());
-        } catch (IOException e) {
+        } catch (FileAlreadyExistsException e) {
             System.err.println("A Gitlet.Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
+        } catch (IOException e) {
+            e.printStackTrace();
             System.exit(0);
         }
         commit(new String[]{"commit", "initial commit"}, true);
@@ -173,9 +196,8 @@ public class Gitlet {
      * 按时间逆序打印当前branch上的所有提交历史，直到全局的第一次提交
      * @param args 命令行参数
      */
-    private void log(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 1);
+    private static void log(String[] args) {
+        checkArgsValid(args, 1);
         for (Commit temp : commitChain) {
             System.out.println(temp);
             System.out.println("===");
@@ -187,9 +209,8 @@ public class Gitlet {
      * 一个较好的解释参见https://blog.walterlv.com/post/git-merge-principle.html
      * 详细算法参见CommitChain::mergeWithBranch方法的注释
      */
-    private void merge(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void merge(String[] args) {
+        checkArgsValid(args, 2);
         //下面的几行注释代码是为了解决当前暂存区还有文件时进行merge的问题：是直接忽略还是提示用户提交暂存后再做决定
         //为了偷懒，我毅然选择了前者
 //        if (stage.getNumberOfStagedFiles() != 0) {
@@ -228,9 +249,8 @@ public class Gitlet {
      * 指定commit内所有文件快照都会被复制到它们原来所在的目录，替代现有的版本（如果现在存在的话）
      * @param args 命令行参数
      */
-    private void reset(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void reset(String[] args) {
+        checkArgsValid(args, 2);
         try {
             commitChain.resetTo(Utils.fromHash2DirName(args[1]));
         } catch (NoSuchCommitException e) {
@@ -245,9 +265,8 @@ public class Gitlet {
      * 删除暂存区的指定文件，同时也删除工作目录的对应文件
      * @param args 命令行参数
      */
-    private void rm(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void rm(String[] args) {
+        checkArgsValid(args, 2);
         try {
             String hashOfRemovedFile = stage.untrackFile(Paths.get(args[1]));
             blobPool.rmFile(hashOfRemovedFile);
@@ -264,9 +283,8 @@ public class Gitlet {
      * 删除指定分支
      * @param args 命令行参数
      */
-    private void rmBranch(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void rmBranch(String[] args) {
+        checkArgsValid(args, 2);
         try {
             commitChain.deleteBranch(args[1]);
         } catch (DeleteCurrentBranchException e) {
@@ -285,9 +303,8 @@ public class Gitlet {
      * 3. 工作目录中没有被跟踪的文件
      * @param args 命令行参数
      */
-    private void status(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 1);
+    private static void status(String[] args) {
+        checkArgsValid(args, 1);
         List<String> hashesOfStagedFiles = stage.getHashesOfStagedFiles();
         List<String> untrackFiles = new ArrayList<>(), modifiedFiles = new ArrayList<>(),
                 deletedFiles = new ArrayList<>(), trackingFiles = new ArrayList<>();
@@ -334,9 +351,8 @@ public class Gitlet {
      * 遍历所有Commit对象，打印出具有指定log的Commit对象
      * @param args
      */
-    private void find(String[] args) {
-        Utils.checkInitialized();
-        Utils.checkArgsValid(args, 2);
+    private static void find(String[] args) {
+        checkArgsValid(args, 2);
         boolean noSuchCommit = true;
         Iterator<Map.Entry<String,Commit>> iterator = commitChain.getAllCommitsIterator();
         while(iterator.hasNext()) {

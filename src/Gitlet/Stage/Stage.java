@@ -25,7 +25,8 @@ public class Stage implements Serializable {
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(path.toString()));
             return (Stage) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            return new Stage();
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -41,8 +42,7 @@ public class Stage implements Serializable {
         return new ArrayList<>(tracking.values());
     }
 
-    //不能直接暴露，重写
-    public Map<String, String> getTracking() { return tracking; }
+    public Map<String, String> getTrackingFiles() { return Map.copyOf(tracking); }
 
     public int getNumberOfStagedFiles() {
         return tracking.size();

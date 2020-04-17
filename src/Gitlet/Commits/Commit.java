@@ -25,6 +25,7 @@ public class Commit implements Serializable {
     private String author;
     //holds the hash values of commited files.
     //files can be retrieved using hash value through the Gitlet.Gitlet.Blobs.BlobPool object.
+    //filename -> sha-1 of file
     private Map<String, String> files;
 
     Commit(ZonedDateTime timestamp, String log, Map<String, String> commitFiles,

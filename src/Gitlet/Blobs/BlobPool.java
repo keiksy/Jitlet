@@ -22,7 +22,8 @@ public class BlobPool implements Serializable {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(path.toString()));
             return (BlobPool) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
-            return new BlobPool();
+            e.printStackTrace();
+            return null;
         }
     }
 
